@@ -61,7 +61,9 @@ def test_create_redirect_and_stats(client):
     assert len(code) == 7
     r = client.get(f"/{code}")
     assert r.status_code == 302 and r.headers["Location"] == "https://example.com/docs"
-    assert client.get(f"/api/links/{code}").get_json()["hits"] == 1
+    stats = client.get(f"/api/links/{code}").get_json()
+    assert stats["hits"] == 1 and stats["short_url"] == f"http://localhost/{code}"
+    assert client.get(f"/{code}").headers["X-Robots-Tag"] == "noindex"
 
 
 def test_surrounding_whitespace_is_stripped(client):

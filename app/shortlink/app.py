@@ -166,14 +166,16 @@ def create_app(store=None, fault_error_rate=None, fault_latency_ms=None, fault_a
         url = store.hit(code)
         if url is None:
             return jsonify(error="not found"), 404
-        return redirect(url, code=302)
+        resp = redirect(url, code=302)
+        resp.headers["X-Robots-Tag"] = "noindex"  # short links should not be indexed as pages
+        return resp
 
     @app.get("/api/links/<code>")
     def stats(code):
         link = store.get(code)
         if link is None:
             return jsonify(error="not found"), 404
-        return jsonify(link)
+        return jsonify({**link, "short_url": f"{request.host_url}{code}"})
 
     @app.get("/healthz")
     def healthz():
