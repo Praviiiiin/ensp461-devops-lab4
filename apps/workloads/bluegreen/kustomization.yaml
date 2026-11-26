@@ -22,3 +22,17 @@ patches:
               - name: shortlink
                 env:
                   - { name: PGDATABASE, value: sl_bg }
+  # Rollback drill: the green build carries an injected fault (20% of user requests fail with 500).
+  - target: { kind: Deployment, name: shortlink }
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata: { name: shortlink }
+      spec:
+        template:
+          spec:
+            containers:
+              - name: shortlink
+                env:
+                  - { name: APP_VERSION, value: 2.3.0-fault }
+                  - { name: FAULT_ERROR_RATE, value: "0.2" }
