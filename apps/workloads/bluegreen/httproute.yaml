@@ -5,6 +5,6 @@ kind: HTTPRoute
 metadata: { name: shortlink }
 spec:
   parentRefs: [{ name: public, namespace: envoy-gateway-system }]
-  hostnames: [bluegreen.shortlink.test, bg.shortlink.test]
+  hostnames: [bluegreen.shortlink.test]
   rules:
     - backendRefs: [{ name: shortlink, port: 80 }]
