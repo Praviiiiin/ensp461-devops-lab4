@@ -1,0 +1,41 @@
+# Bootstrap, replica seeding and Velero hook scripts for the PostgreSQL pair.
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: pg-scripts }
+data:
+  10-roles.sh: |
+    #!/bin/sh
+    # Runs once on the primary's first start (docker-entrypoint-initdb.d).
+    set -e
+    psql -v ON_ERROR_STOP=1 -U postgres <<SQL
+    CREATE ROLE replicator WITH REPLICATION LOGIN PASSWORD '$REPLICATION_PASSWORD';
+    CREATE ROLE shortlink LOGIN PASSWORD '$APP_PASSWORD';
+    CREATE DATABASE sl_canary OWNER shortlink;
+    CREATE DATABASE sl_bg OWNER shortlink;
+    SQL
+    echo "host replication replicator all scram-sha-256" >> "$PGDATA/pg_hba.conf"
+  seed-replica.sh: |
+    #!/bin/sh
+    # Init container of the standby: clone the primary once, then stream from it (-R).
+    set -e
+    if [ -s "$PGDATA/PG_VERSION" ]; then echo "data present, skipping base backup"; exit 0; fi
+    until pg_isready -h "$PRIMARY_HOST" -U replicator; do sleep 2; done
+    PGPASSWORD="$REPLICATION_PASSWORD" pg_basebackup -h "$PRIMARY_HOST" -U replicator \
+      -D "$PGDATA" -R -X stream -P
+  backup-dump.sh: |
+    #!/bin/sh
+    # Velero pre-backup hook: logical dump of the app databases on whichever pod is primary.
+    set -e
+    rm -f /dumps/*.dump /dumps/taken-at
+    if [ "$(psql -U postgres -Atc 'select pg_is_in_recovery()')" = t ]; then echo "standby: no dump"; exit 0; fi
+    for db in sl_canary sl_bg; do pg_dump -U postgres -Fc -d "$db" -f "/dumps/$db.dump"; done
+    date -u +%FT%TZ > /dumps/taken-at
+    ls -l /dumps
+  restore-dump.sh: |
+    #!/bin/sh
+    # Velero post-restore hook: load the dumps into the freshly initialised primary.
+    set -e
+    [ -s /dumps/taken-at ] || { echo "no dump in this pod"; exit 0; }
+    until psql -U postgres -d sl_bg -Atc 'select 1' >/dev/null 2>&1; do sleep 2; done
+    for db in sl_canary sl_bg; do pg_restore -U postgres --clean --if-exists --no-owner --role=shortlink -d "$db" "/dumps/$db.dump"; done
+    echo "restored dump taken at $(cat /dumps/taken-at)"

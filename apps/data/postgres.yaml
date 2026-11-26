@@ -1,0 +1,148 @@
+# PostgreSQL 17 pair with asynchronous streaming replication.
+# pg-a starts as primary (initdb + roles); pg-b clones pg-a with pg_basebackup -R and streams.
+# The "pg" Service pins the writable member by pod name, so a failover is a reviewed Git change
+# (selector edit) plus an imperative pg_promote() - see scripts/pg-failover.sh.
+apiVersion: v1
+kind: Service
+metadata: { name: pg-hl }
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector: { app: pg }
+  ports: [{ name: pg, port: 5432 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: pg }
+spec:
+  selector: { app: pg, statefulset.kubernetes.io/pod-name: pg-a-0 }
+  ports: [{ name: pg, port: 5432 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: pg-standby }
+spec:
+  selector: { app: pg, statefulset.kubernetes.io/pod-name: pg-b-0 }
+  ports: [{ name: pg, port: 5432 }]
+---
+# Initial primary.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: pg-a }
+spec:
+  serviceName: pg-hl
+  replicas: 1
+  selector: { matchLabels: { app: pg, member: pg-a } }
+  template:
+    metadata:
+      labels: { app: pg, member: pg-a }
+      annotations:
+        # Velero: dump the app databases before the backup and ship only the dump volume.
+        backup.velero.io/backup-volumes: dumps
+        pre.hook.backup.velero.io/container: postgres
+        pre.hook.backup.velero.io/command: '["/bin/sh", "/scripts/backup-dump.sh"]'
+        pre.hook.backup.velero.io/timeout: 2m
+    spec:
+      securityContext: { runAsUser: 70, runAsGroup: 70, fsGroup: 70 }
+      terminationGracePeriodSeconds: 20
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          args: ["-c", "wal_keep_size=512MB", "-c", "max_connections=60"]
+          env:
+          - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          - name: POSTGRES_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: superuser-password } }
+          - name: REPLICATION_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: replication-password } }
+          - name: APP_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: app-password } }
+          ports: [{ name: pg, containerPort: 5432 }]
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "postgres", "-h", "127.0.0.1"] }
+            periodSeconds: 2
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: scripts, mountPath: /scripts }
+            - { name: scripts, mountPath: /docker-entrypoint-initdb.d/10-roles.sh, subPath: 10-roles.sh }
+            - { name: dumps, mountPath: /dumps }
+      volumes:
+        - { name: scripts, configMap: { name: pg-scripts } }
+        - { name: dumps, emptyDir: {} }
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: { requests: { storage: 2Gi } }
+---
+# Initial hot standby, seeded from pg-a.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: pg-b }
+spec:
+  serviceName: pg-hl
+  replicas: 1
+  selector: { matchLabels: { app: pg, member: pg-b } }
+  template:
+    metadata:
+      labels: { app: pg, member: pg-b }
+      annotations:
+        # Velero: dump the app databases before the backup and ship only the dump volume.
+        backup.velero.io/backup-volumes: dumps
+        pre.hook.backup.velero.io/container: postgres
+        pre.hook.backup.velero.io/command: '["/bin/sh", "/scripts/backup-dump.sh"]'
+        pre.hook.backup.velero.io/timeout: 2m
+    spec:
+      securityContext: { runAsUser: 70, runAsGroup: 70, fsGroup: 70 }
+      terminationGracePeriodSeconds: 20
+      initContainers:
+        - name: seed-replica
+          image: postgres:17-alpine
+          command: ["/bin/sh", "/scripts/seed-replica.sh"]
+          env:
+          - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          - name: POSTGRES_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: superuser-password } }
+          - name: REPLICATION_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: replication-password } }
+          - name: APP_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: app-password } }
+          - { name: PRIMARY_HOST, value: pg-a-0.pg-hl }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: scripts, mountPath: /scripts }
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          args: ["-c", "wal_keep_size=512MB", "-c", "max_connections=60"]
+          env:
+          - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          - name: POSTGRES_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: superuser-password } }
+          - name: REPLICATION_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: replication-password } }
+          - name: APP_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: app-password } }
+          ports: [{ name: pg, containerPort: 5432 }]
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "postgres", "-h", "127.0.0.1"] }
+            periodSeconds: 2
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: scripts, mountPath: /scripts }
+            - { name: scripts, mountPath: /docker-entrypoint-initdb.d/10-roles.sh, subPath: 10-roles.sh }
+            - { name: dumps, mountPath: /dumps }
+      volumes:
+        - { name: scripts, configMap: { name: pg-scripts } }
+        - { name: dumps, emptyDir: {} }
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: { requests: { storage: 2Gi } }
