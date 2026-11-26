@@ -8,7 +8,7 @@ resources:
   - canary.yaml
 images:
   - name: ghcr.io/praviiiiin/shortlink-lab4
-    newTag: 2.0.0-7d4ac59  # promotion = changing this line in Git
+    newTag: 2.1.0-fbefde2  # promotion = changing this line in Git
 patches:
   - target: { kind: Deployment, name: shortlink }
     patch: |
