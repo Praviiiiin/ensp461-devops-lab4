@@ -45,7 +45,9 @@ def client():
         ("example.com", False),
         ("javascript:alert(1)", False),
         (None, False),
-        ("https://x.io/" + "a" * 2100, False),
+        pytest.param("https://x.io/" + "a" * 2100, False, id="longer-than-2048"),
+        ("https://user:pass@example.com/", False),
+        ("https://:token@example.com/", False),
     ],
 )
 def test_valid_url(url, ok):
@@ -60,6 +62,11 @@ def test_create_redirect_and_stats(client):
     r = client.get(f"/{code}")
     assert r.status_code == 302 and r.headers["Location"] == "https://example.com/docs"
     assert client.get(f"/api/links/{code}").get_json()["hits"] == 1
+
+
+def test_surrounding_whitespace_is_stripped(client):
+    r = client.post("/api/links", json={"url": "  https://krmu.edu.in/admissions \n"})
+    assert r.status_code == 201 and r.get_json()["url"] == "https://krmu.edu.in/admissions"
 
 
 def test_rejects_bad_url(client):

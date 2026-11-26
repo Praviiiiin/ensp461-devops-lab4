@@ -51,10 +51,11 @@ def new_code() -> str:
 
 
 def valid_url(url) -> bool:
-    if not isinstance(url, str) or len(url) > MAX_URL_LEN:
+    if not isinstance(url, str):
         return False
     parts = urlparse(url)
-    return parts.scheme in ("http", "https") and bool(parts.netloc)
+    # Reject embedded credentials (https://user:pass@host): they would leak through redirects.
+    return parts.scheme in ("http", "https") and bool(parts.hostname) and not (parts.username or parts.password)
 
 
 def create_app(store=None, fault_error_rate=None, fault_latency_ms=None, fault_after_s=None):
@@ -135,6 +136,7 @@ def create_app(store=None, fault_error_rate=None, fault_latency_ms=None, fault_a
     def create_link():
         body = request.get_json(silent=True) or {}
         url = body.get("url")
+        url = url.strip() if isinstance(url, str) else url
         if not valid_url(url):
             return jsonify(error="url must be an absolute http(s) URL up to 2048 characters"), 400
         alias = body.get("alias")
