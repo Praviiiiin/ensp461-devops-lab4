@@ -1,0 +1,47 @@
+# Progressive canary on the Gateway API: Flagger shifts 10% more of the users of
+# canary.shortlink.test to the new version every 30s (up to 50%), then promotes it.
+# Two failed metric checks in a row roll the canary back to 0% automatically.
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata: { name: shortlink }
+spec:
+  provider: gatewayapi:v1
+  targetRef: { apiVersion: apps/v1, kind: Deployment, name: shortlink }
+  autoscalerRef: { apiVersion: autoscaling/v2, kind: HorizontalPodAutoscaler, name: shortlink }
+  progressDeadlineSeconds: 300
+  service:
+    port: 80
+    targetPort: 8080
+    hosts: [canary.shortlink.test]
+    gatewayRefs: [{ name: public, namespace: envoy-gateway-system }]
+  analysis:
+    interval: 30s
+    threshold: 2
+    stepWeight: 10
+    maxWeight: 50
+    metrics:
+      - name: error-rate-percent
+        templateRef: { name: shortlink-error-rate, namespace: flagger-system }
+        thresholdRange: { max: 1 }
+        interval: 1m
+      - name: p95-latency-ms
+        templateRef: { name: shortlink-p95-latency-ms, namespace: flagger-system }
+        thresholdRange: { max: 250 }
+        interval: 1m
+    webhooks:
+      - name: acceptance-test
+        type: pre-rollout
+        url: http://loadtester.flagger-system/
+        timeout: 30s
+        metadata:
+          type: bash
+          cmd: >-
+            curl -s -XPOST -H 'Content-Type: application/json' -d '{"url":"https://krmu.edu.in","alias":"krmu-canary"}'
+            http://shortlink-canary.sl-canary/api/links >/dev/null;
+            test "$(curl -s -o /dev/null -w '%{http_code}' http://shortlink-canary.sl-canary/krmu-canary)" = 302
+      - name: synthetic-load
+        type: rollout
+        url: http://loadtester.flagger-system/
+        timeout: 5s
+        metadata:
+          cmd: "hey -z 1m -q 5 -c 2 -disable-redirects http://shortlink-canary.sl-canary/krmu-canary"

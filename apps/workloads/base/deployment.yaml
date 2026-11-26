@@ -1,0 +1,52 @@
+# ShortLink target Deployment. Flagger clones it into <name>-primary (stable traffic) and
+# uses this one as the canary/green; replicas are owned by the HPA, so none are set here.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shortlink
+  labels: { app: shortlink }
+spec:
+  selector: { matchLabels: { app: shortlink } }
+  strategy: { rollingUpdate: { maxUnavailable: 0, maxSurge: 1 } }
+  template:
+    metadata:
+      labels: { app: shortlink }
+      annotations: { prometheus.io/scrape: "true", prometheus.io/port: "8080" }
+    spec:
+      automountServiceAccountToken: false
+      securityContext: { runAsNonRoot: true, fsGroup: 10001, seccompProfile: { type: RuntimeDefault } }
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: shortlink
+          image: ghcr.io/praviiiiin/shortlink-lab4:latest  # pinned per environment by kustomize images
+          ports: [{ name: http, containerPort: 8080 }]
+          env:
+            - { name: PGHOST, value: pg.sl-data.svc.cluster.local }
+            - { name: PGUSER, value: shortlink }
+            - { name: PGDATABASE, value: set-by-overlay }
+            - { name: PGCONNECT_TIMEOUT, value: "3" }
+            - name: PGPASSWORD
+              valueFrom: { secretKeyRef: { name: shortlink-secrets, key: pg-password } }
+          volumeMounts:
+            - { name: admin-token, mountPath: /etc/shortlink, readOnly: true }
+            - { name: tmp, mountPath: /tmp }  # gunicorn worker heartbeat; root filesystem is read-only
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            periodSeconds: 3
+            failureThreshold: 2
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+          lifecycle:
+            preStop: { sleep: { seconds: 5 } }  # let the gateway drop this endpoint before gunicorn stops
+          resources:
+            requests: { cpu: 50m, memory: 96Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+      volumes:
+        - { name: tmp, emptyDir: { medium: Memory, sizeLimit: 16Mi } }
+        - name: admin-token
+          secret: { secretName: shortlink-secrets, items: [{ key: admin-token, path: admin-token }], defaultMode: 0440 }

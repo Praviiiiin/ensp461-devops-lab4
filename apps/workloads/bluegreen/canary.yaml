@@ -1,0 +1,44 @@
+# Blue-green with Kubernetes Service switching: the new version (green, Deployment "shortlink")
+# is started next to the live one (blue, "shortlink-primary"), tested in isolation through
+# shortlink-canary for 6 iterations, then the "shortlink" Service is switched to it in one step.
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata: { name: shortlink }
+spec:
+  provider: kubernetes
+  targetRef: { apiVersion: apps/v1, kind: Deployment, name: shortlink }
+  autoscalerRef: { apiVersion: autoscaling/v2, kind: HorizontalPodAutoscaler, name: shortlink }
+  progressDeadlineSeconds: 300
+  service:
+    port: 80
+    targetPort: 8080
+  analysis:
+    interval: 15s
+    threshold: 2
+    iterations: 6
+    metrics:
+      - name: error-rate-percent
+        templateRef: { name: shortlink-error-rate, namespace: flagger-system }
+        thresholdRange: { max: 1 }
+        interval: 1m
+      - name: p95-latency-ms
+        templateRef: { name: shortlink-p95-latency-ms, namespace: flagger-system }
+        thresholdRange: { max: 250 }
+        interval: 1m
+    webhooks:
+      - name: acceptance-test
+        type: pre-rollout
+        url: http://loadtester.flagger-system/
+        timeout: 30s
+        metadata:
+          type: bash
+          cmd: >-
+            curl -s -XPOST -H 'Content-Type: application/json' -d '{"url":"https://krmu.edu.in","alias":"krmu-green"}'
+            http://shortlink-canary.sl-bg/api/links >/dev/null;
+            test "$(curl -s -o /dev/null -w '%{http_code}' http://shortlink-canary.sl-bg/krmu-green)" = 302
+      - name: synthetic-load-on-green
+        type: rollout
+        url: http://loadtester.flagger-system/
+        timeout: 5s
+        metadata:
+          cmd: "hey -z 1m -q 5 -c 2 -disable-redirects http://shortlink-canary.sl-bg/krmu-green"
