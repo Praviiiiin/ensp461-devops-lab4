@@ -1,0 +1,196 @@
+
+# 2026-11-26 16:47:39 IST
+$ export GH_TOKEN=$(gh auth token -u Praviiiiin); R=Praviiiiin/ensp461-devops-lab4; for id in 45795139678 45798321003 45798477435 45804779011; do gh run view $id -R $R --json databaseId,displayTitle,headSha,conclusion,createdAt,updatedAt,jobs --jq "\"== run \(.databaseId) \(.headSha[0:7]) \(.conclusion) \(.createdAt[11:19])-\(.updatedAt[11:19]) UTC wall=\((.updatedAt|fromdate)-(.createdAt|fromdate))s \\\"\(.displayTitle)\\\"\", (.jobs[] | \"  job \(.name): \(.conclusion) \(.startedAt[11:19])-\(.completedAt[11:19]) (\(if .conclusion == \"skipped\" then 0 else (.completedAt|fromdate)-(.startedAt|fromdate) end)s)\", (.steps[] | select(.conclusion != \"skipped\" or true) | \"      \(.number). \(.name): \(.conclusion) \(if .startedAt and .completedAt then ((.completedAt|fromdate)-(.startedAt|fromdate)|tostring)+\"s\" else \"-\" end)\"))"; done
+== run 45795139678 df9e81b cancelled 09:46:49-09:49:52 UTC wall=183s "Add CI/CD pipeline with test, secret-scan and deploy gates"
+  job gate 1 - lint and unit tests: success 09:46:52-09:47:09 (17s)
+      1. Set up job: success 1s
+      2. Run actions/checkout@v4: success 3s
+      3. Run actions/setup-python@v5: success 2s
+      4. Run pip install -r requirements-dev.txt: success 6s
+      5. Run ruff check . && ruff format --check .: success 0s
+      6. Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q: success 2s
+      11. Post Run actions/setup-python@v5: success 1s
+      12. Post Run actions/checkout@v4: success 0s
+      13. Complete job: success 0s
+  job gate 2 - integration tests (PostgreSQL): success 09:46:52-09:47:21 (29s)
+      1. Set up job: success 2s
+      2. Initialize containers: success 9s
+      3. Run actions/checkout@v4: success 4s
+      4. Run actions/setup-python@v5: success 4s
+      5. Run pip install -r requirements-dev.txt: success 5s
+      6. Run pytest -m integration -v: success 2s
+      10. Post Run actions/setup-python@v5: success 0s
+      11. Post Run actions/checkout@v4: success 0s
+      12. Stop containers: success 0s
+      13. Complete job: success 0s
+  job gate 3 - gitleaks (full history): success 09:46:52-09:47:01 (9s)
+      1. Set up job: success 1s
+      2. Run actions/checkout@v4: success 4s
+      3. Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose: success 2s
+      6. Post Run actions/checkout@v4: success 0s
+      7. Complete job: success 0s
+  job build and push arm64 image: success 09:47:26-09:47:58 (32s)
+      1. Set up job: success 1s
+      2. Run actions/checkout@v4: success 1s
+      3. Run version=$(sed -n 's/^version = "\(.*\)"/\1/p' app/pyproject.toml): success 0s
+      4. Run docker/setup-buildx-action@v3: success 6s
+      5. Run docker/login-action@v3: success 1s
+      6. Run docker/build-push-action@v6: success 17s
+      9. Post Run docker/build-push-action@v6: success 1s
+      10. Post Run docker/login-action@v3: success 1s
+      11. Post Run docker/setup-buildx-action@v3: success 1s
+      12. Post Run actions/checkout@v4: success 0s
+      13. Complete job: success 0s
+  job deploy gate - smoke test pushed image + approval: cancelled 09:47:58-09:49:51 (113s)
+== run 45798321003 64fd9be failure 10:07:15-10:07:41 UTC wall=26s "Release 2.1.0: strip whitespace and reject credential URLs"
+  job gate 3 - gitleaks (full history): success 10:07:19-10:07:27 (8s)
+      1. Set up job: success 0s
+      2. Run actions/checkout@v7: success 1s
+      3. Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose: success 3s
+      6. Post Run actions/checkout@v7: success 0s
+      7. Complete job: success 0s
+  job gate 1 - lint and unit tests: failure 10:07:19-10:07:37 (18s)
+      1. Set up job: success 2s
+      2. Run actions/checkout@v7: success 4s
+      3. Run actions/setup-python@v7: success 4s
+      4. Run pip install -r requirements-dev.txt: success 5s
+      5. Run ruff check . && ruff format --check .: success 0s
+      6. Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q: failure 2s
+      11. Post Run actions/setup-python@v7: skipped 0s
+      12. Post Run actions/checkout@v7: success 0s
+      13. Complete job: success 0s
+  job gate 2 - integration tests (PostgreSQL): success 10:07:19-10:07:41 (22s)
+      1. Set up job: success 1s
+      2. Initialize containers: success 9s
+      3. Run actions/checkout@v7: success 1s
+      4. Run actions/setup-python@v7: success 2s
+      5. Run pip install -r requirements-dev.txt: success 5s
+      6. Run pytest -m integration -v: success 1s
+      10. Post Run actions/setup-python@v7: success 0s
+      11. Post Run actions/checkout@v7: success 0s
+      12. Stop containers: success 1s
+      13. Complete job: success 0s
+  job build and push arm64 image: skipped 10:07:41-10:07:41 (0s)
+  job deploy gate - smoke test pushed image: skipped 10:07:41-10:07:41 (0s)
+== run 45798477435 fbefde2 success 10:08:13-10:10:47 UTC wall=154s "Restore the 2048-character URL limit dropped in 2.1.0"
+  job gate 3 - gitleaks (full history): success 10:08:17-10:08:32 (15s)
+      1. Set up job: success 2s
+      2. Run actions/checkout@v7: success 5s
+      3. Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose: success 4s
+      6. Post Run actions/checkout@v7: success 0s
+      7. Complete job: success 0s
+  job gate 1 - lint and unit tests: success 10:08:16-10:08:29 (13s)
+      1. Set up job: success 1s
+      2. Run actions/checkout@v7: success 0s
+      3. Run actions/setup-python@v7: success 3s
+      4. Run pip install -r requirements-dev.txt: success 4s
+      5. Run ruff check . && ruff format --check .: success 0s
+      6. Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q: success 2s
+      11. Post Run actions/setup-python@v7: success 0s
+      12. Post Run actions/checkout@v7: success 0s
+      13. Complete job: success 0s
+  job gate 2 - integration tests (PostgreSQL): success 10:08:17-10:08:49 (32s)
+      1. Set up job: success 3s
+      2. Initialize containers: success 8s
+      3. Run actions/checkout@v7: success 4s
+      4. Run actions/setup-python@v7: success 6s
+      5. Run pip install -r requirements-dev.txt: success 5s
+      6. Run pytest -m integration -v: success 1s
+      10. Post Run actions/setup-python@v7: success 0s
+      11. Post Run actions/checkout@v7: success 1s
+      12. Stop containers: success 0s
+      13. Complete job: success 0s
+  job build and push arm64 image: success 10:08:54-10:09:26 (32s)
+      1. Set up job: success 1s
+      2. Run actions/checkout@v7: success 1s
+      3. Run version=$(sed -n 's/^version = "\(.*\)"/\1/p' app/pyproject.toml): success 0s
+      4. Run docker/setup-buildx-action@v4: success 7s
+      5. Run docker/login-action@v4: success 1s
+      6. Run docker/build-push-action@v7: success 15s
+      9. Post Run docker/build-push-action@v7: success 2s
+      10. Post Run docker/login-action@v4: success 0s
+      11. Post Run docker/setup-buildx-action@v4: success 1s
+      12. Post Run actions/checkout@v7: success 0s
+      13. Complete job: success 0s
+  job deploy gate - smoke test pushed image: success 10:10:31-10:10:46 (15s)
+      1. Set up job: success 0s
+      2. Initialize containers: success 9s
+      3. Run the exact pushed image (by digest) against PostgreSQL: success 4s
+      4. Promotion instructions: success 0s
+      8. Stop containers: success 0s
+      9. Complete job: success 0s
+== run 45804779011 1b807fa success 10:48:45-10:51:05 UTC wall=140s "Release 2.2.0: short_url in link stats and noindex redirects"
+  job gate 2 - integration tests (PostgreSQL): success 10:48:49-10:49:10 (21s)
+      1. Set up job: success 1s
+      2. Initialize containers: success 7s
+      3. Run actions/checkout@v7: success 1s
+      4. Run actions/setup-python@v7: success 2s
+      5. Run pip install -r requirements-dev.txt: success 4s
+      6. Run pytest -m integration -v: success 1s
+      10. Post Run actions/setup-python@v7: success 0s
+      11. Post Run actions/checkout@v7: success 1s
+      12. Stop containers: success 0s
+      13. Complete job: success 0s
+  job gate 3 - gitleaks (full history): success 10:48:49-10:49:05 (16s)
+      1. Set up job: success 2s
+      2. Run actions/checkout@v7: success 5s
+      3. Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose: success 5s
+      6. Post Run actions/checkout@v7: success 1s
+      7. Complete job: success 0s
+  job gate 1 - lint and unit tests: success 10:48:49-10:49:08 (19s)
+      1. Set up job: success 2s
+      2. Run actions/checkout@v7: success 4s
+      3. Run actions/setup-python@v7: success 4s
+      4. Run pip install -r requirements-dev.txt: success 5s
+      5. Run ruff check . && ruff format --check .: success 0s
+      6. Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q: success 2s
+      11. Post Run actions/setup-python@v7: success 0s
+      12. Post Run actions/checkout@v7: success 1s
+      13. Complete job: success 0s
+  job build and push arm64 image: success 10:49:15-10:49:43 (28s)
+      1. Set up job: success 1s
+      2. Run actions/checkout@v7: success 0s
+      3. Run version=$(sed -n 's/^version = "\(.*\)"/\1/p' app/pyproject.toml): success 0s
+      4. Run docker/setup-buildx-action@v4: success 6s
+      5. Run docker/login-action@v4: success 1s
+      6. Run docker/build-push-action@v7: success 13s
+      9. Post Run docker/build-push-action@v7: success 2s
+      10. Post Run docker/login-action@v4: success 0s
+      11. Post Run docker/setup-buildx-action@v4: success 1s
+      12. Post Run actions/checkout@v7: success 0s
+      13. Complete job: success 0s
+  job deploy gate - smoke test pushed image: success 10:50:49-10:51:05 (16s)
+      1. Set up job: success 0s
+      2. Initialize containers: success 8s
+      3. Run the exact pushed image (by digest) against PostgreSQL: success 4s
+      4. Remove the smoke container: success 0s
+      5. Promotion instructions: success 1s
+      10. Stop containers: success 0s
+      11. Complete job: success 0s
+[exit 0]
+
+# 2026-11-26 16:47:53 IST
+$ export GH_TOKEN=$(gh auth token -u Praviiiiin); R=Praviiiiin/ensp461-devops-lab4; gh api repos/$R/environments/lab4-cluster --jq "{name, protection_rules: [.protection_rules[] | {type, wait_timer}], deployment_branch_policy}"; gh api repos/$R/environments/lab4-cluster/deployment-branch-policies --jq "[.branch_policies[].name]"; gh run view 45804779011 -R $R --log | cut -f2- | grep -E " passed| PASSED|no leaks|commits scanned|smoke test passed|pushing manifest for|TOTAL " | sed -E "s/[0-9-]{10}T[0-9:.]+Z //" | grep -v "36;1m"
+{"deployment_branch_policy":{"custom_branch_policies":true,"protected_branches":false},"name":"lab4-cluster","protection_rules":[{"type":"wait_timer","wait_timer":1},{"type":"branch_policy","wait_timer":null}]}
+["main"]
+Run pytest -m integration -v	tests/test_integration.py::test_ready_against_real_db PASSED             [ 25%]
+Run pytest -m integration -v	tests/test_integration.py::test_round_trip_persists_hits PASSED          [ 50%]
+Run pytest -m integration -v	tests/test_integration.py::test_duplicate_code_raises_code_taken PASSED  [ 75%]
+Run pytest -m integration -v	tests/test_integration.py::test_delete_removes_row PASSED                [100%]
+Run pytest -m integration -v	======================= 4 passed, 27 deselected in 0.48s =======================
+Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose	^[[90m10:49AM^[[0m ^[[32mINF^[[0m ^[[1m20 commits scanned.^[[0m
+Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose	^[[90m10:49AM^[[0m ^[[32mINF^[[0m ^[[1mno leaks found^[[0m
+Run ruff check . && ruff format --check .	All checks passed!
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	TOTAL                     180     29    84%
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	27 passed, 4 deselected in 0.99s
+Run docker/build-push-action@v7	#18 pushing manifest for ghcr.io/praviiiiin/shortlink-lab4:2.2.0-1b807fa@sha256:c7ea09d05ccba694390f4cd0282f31b84c4e48380798784026fe4af6ffd7d700
+Run docker/build-push-action@v7	#18 pushing manifest for ghcr.io/praviiiiin/shortlink-lab4:2.2.0-1b807fa@sha256:c7ea09d05ccba694390f4cd0282f31b84c4e48380798784026fe4af6ffd7d700 2.8s done
+Run the exact pushed image (by digest) against PostgreSQL	smoke test passed for ghcr.io/praviiiiin/shortlink-lab4@sha256:c7ea09d05ccba694390f4cd0282f31b84c4e48380798784026fe4af6ffd7d700
+[exit 0]
+
+# 2026-11-26 16:49:38 IST
+$ export GH_TOKEN=$(gh auth token -u Praviiiiin); for id in 45798477435 45804779011; do echo "== annotations of run $id"; gh api repos/Praviiiiin/ensp461-devops-lab4/actions/runs/$id/jobs --jq ".jobs[] | select(.name|startswith(\"deploy\")) | .check_run_url" | sed "s#https://api.github.com/##" | xargs -I{} gh api {}/annotations --jq ".[] | \"\(.annotation_level): \(.message)\""; done
+== annotations of run 45798477435
+warning: Docker network rm failed with exit code 1
+== annotations of run 45804779011
+[exit 0]

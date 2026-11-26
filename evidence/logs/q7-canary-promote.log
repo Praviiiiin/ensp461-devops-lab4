@@ -1,0 +1,43 @@
+
+# 2026-11-26 16:24:16 IST
+$ echo "pushed at $(cat evidence/data/q7-canary-promote.pushed-at) UTC"; ./scripts/watch-canary.sh sl-canary 700
+pushed at 10:54:11 UTC
+10:54:16 +0s Failed weight=0 failedChecks=0 iterations=0
+10:56:20 +124s Progressing weight=0 failedChecks=0 iterations=0
+10:56:48 +152s Progressing weight=10 failedChecks=0 iterations=0
+10:57:19 +183s Progressing weight=20 failedChecks=0 iterations=0
+10:57:48 +212s Progressing weight=30 failedChecks=0 iterations=0
+10:58:19 +243s Progressing weight=40 failedChecks=0 iterations=0
+10:58:48 +272s Progressing weight=50 failedChecks=0 iterations=0
+10:59:19 +303s Promoting weight=50 failedChecks=0 iterations=0
+10:59:50 +334s Finalising weight=0 failedChecks=0 iterations=0
+11:00:19 +363s Succeeded weight=0 failedChecks=0 iterations=0
+[exit 0]
+
+# 2026-11-26 16:34:13 IST
+$ kubectl -n flagger-system logs deploy/flagger --since=15m | python3 -c 'import sys,json
+for l in sys.stdin:
+    try: d=json.loads(l)
+    except ValueError: continue
+    if d.get("canary")=="shortlink.sl-canary": print(d["ts"][11:19], d["msg"])' | grep -v 10:4 | grep -v 10:50 | grep -v 10:51; kubectl -n sl-canary get deploy -o custom-columns=NAME:.metadata.name,REPLICAS:.spec.replicas,IMAGE:.spec.template.spec.containers[0].image; cat evidence/data/q7-canary-promote.summary; ./scripts/prom-range.sh 'flagger_canary_weight{namespace="sl-canary"}' 1795690451 1795691050 evidence/data/q7-canary-promote-weights.json; ./scripts/prom-range.sh 'sum by (version) (rate(shortlink_http_requests_total{namespace="sl-canary",route!~"/healthz|/readyz|/metrics"}[30s]))' 1795690451 1795691050 evidence/data/q7-canary-promote-rps-by-version.json; ./scripts/prom-range.sh 'histogram_quantile(0.95, sum by (le, version) (rate(shortlink_http_request_duration_seconds_bucket{namespace="sl-canary",route!~"/healthz|/readyz|/metrics"}[1m])))' 1795690451 1795691050 evidence/data/q7-canary-promote-p95-by-version.json
+10:56:18 New revision detected! Scaling up shortlink.sl-canary
+10:56:48 Starting canary analysis for shortlink.sl-canary
+10:56:48 Pre-rollout check acceptance-test passed
+10:56:48 Advance shortlink.sl-canary canary weight 10
+10:57:18 Advance shortlink.sl-canary canary weight 20
+10:57:48 Advance shortlink.sl-canary canary weight 30
+10:58:18 Advance shortlink.sl-canary canary weight 40
+10:58:48 Advance shortlink.sl-canary canary weight 50
+10:59:18 Copying shortlink.sl-canary template spec to shortlink-primary.sl-canary
+10:59:18 Secret shortlink-secrets-primary synced
+10:59:48 HorizontalPodAutoscaler v2 shortlink-primary.sl-canary updated
+10:59:48 Routing all traffic to primary
+11:00:18 Promotion completed! Scaling down shortlink.sl-canary
+NAME                REPLICAS   IMAGE
+shortlink           0          ghcr.io/praviiiiin/shortlink-lab4:2.2.0-1b807fa
+shortlink-primary   3          ghcr.io/praviiiiin/shortlink-lab4:2.2.0-1b807fa
+probe canary.shortlink.test 600s: requests=38670 ok=38670 5xx=0 conn_errors=0 other=0 slow(>0.5s)=0 availability=100.000% seconds_with_errors=0 v2.1.0=17036 v2.2.0=21634
+evidence/data/q7-canary-promote-weights.json success 2 series
+evidence/data/q7-canary-promote-rps-by-version.json success 2 series
+evidence/data/q7-canary-promote-p95-by-version.json success 2 series
+[exit 0]

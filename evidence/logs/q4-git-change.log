@@ -1,0 +1,14 @@
+
+# 2026-11-26 15:44:56 IST
+$ git log -1 --format='%h %s'; date -u +%T; git push origin main 2>&1 | tail -1; ./scripts/wait-http.sh bg.shortlink.test /healthz 200; flux get ks apps; kubectl -n sl-bg get httproute shortlink
+631990c Serve the blue-green environment on bg.shortlink.test as well
+10:14:56
+   c10b928..631990c  main -> main
+10:14:59 +0s HTTP 404
+10:16:57 +118s HTTP 200
+back to HTTP 200 after 118s
+NAME	REVISION          	SUSPENDED	READY	MESSAGE                              
+apps	main@sha1:631990cd	False    	True 	Applied revision: main@sha1:631990cd	
+NAME        HOSTNAMES                                          AGE
+shortlink   ["bluegreen.shortlink.test","bg.shortlink.test"]   5m1s
+[exit 0]

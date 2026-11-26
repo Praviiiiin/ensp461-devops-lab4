@@ -1,0 +1,21 @@
+
+# 2026-11-26 15:52:28 IST
+$ start=$(date +%s); last=""; while :; do s=$(kubectl -n sl-canary get canary shortlink -o jsonpath="{.status.phase} weight={.status.canaryWeight} failed={.status.failedChecks} iter={.status.iterations}"); [ "$s" != "$last" ] && echo "$(date -u +%T) +$(( $(date +%s)-start ))s $s" && last=$s; case $s in Succeeded*|Failed*) break;; esac; [ $(( $(date +%s)-start )) -gt 900 ] && break; sleep 2; done
+10:22:28 +0s Initialized weight=0 failed=0 iter=0
+10:24:07 +99s Progressing weight=0 failed=0 iter=0
+10:24:38 +130s Progressing weight=10 failed=0 iter=0
+10:25:07 +159s Progressing weight=20 failed=0 iter=0
+10:25:38 +190s Progressing weight=30 failed=0 iter=0
+[exit 0]
+
+# 2026-11-26 16:13:27 IST
+$ echo "host slept 15:55:40-16:13:10 IST (pmset log), resuming watch"; pmset -g log | grep -E "^2026-11-26 1[56]:.*(Sleep  |FullWake)" | tail -3; start=$(date +%s); last=""; while :; do s=$(kubectl -n sl-canary get canary shortlink -o jsonpath="{.status.phase} weight={.status.canaryWeight} failed={.status.failedChecks}"); [ "$s" != "$last" ] && echo "$(date -u +%T) +$(( $(date +%s)-start ))s $s" && last=$s; case $s in Succeeded*|Failed*) break;; esac; [ $(( $(date +%s)-start )) -gt 600 ] && break; sleep 2; done
+host slept 15:55:40-16:13:10 IST (pmset log), resuming watch
+2026-11-26 15:55:40 +0530 Sleep               	Entering Sleep state due to 'Idle Sleep':TCPKeepAlive=active Using AC (Charge:80%) 105 secs  
+2026-11-26 15:57:37 +0530 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using AC (Charge:80%) 900 secs  
+2026-11-26 16:13:10 +0530 Wake                	DarkWake to FullWake from Deep Idle [CDNVA] : due to HID Activity Using AC (Charge:80%)           
+10:43:31 +0s Progressing weight=50 failed=0
+10:43:49 +18s Promoting weight=50 failed=0
+10:44:18 +47s Finalising weight=0 failed=0
+10:44:49 +78s Succeeded weight=0 failed=0
+[exit 0]

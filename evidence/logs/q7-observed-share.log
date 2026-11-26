@@ -1,0 +1,23 @@
+
+# 2026-11-26 16:49:40 IST
+$ python3 -c "
+import csv
+def share(f, a, b):
+    rows = [x for x in csv.DictReader(open(f)) if a <= int(x[\"second\"]) < b]
+    c = sum(int(x[\"canary\"]) for x in rows); p = sum(int(x[\"primary\"]) for x in rows); e = sum(int(x[\"canary_err\"]) for x in rows)
+    return f\"canary={c} primary={p} share={100*c/(c+p):.2f}% canary_5xx={e}\"
+f = \"evidence/data/q7-canary-promote.csv\"  # t0 = 10:54:11 UTC; steps from the Flagger log, 3 s settle margin
+for w, a, b in [(10,160,186),(20,190,216),(30,220,246),(40,250,276),(50,280,306),(\"50 (Promoting)\",310,336),(0,342,600)]:
+    print(\"promote weight\", w, \"seconds\", a, \"-\", b, share(f, a, b))
+f = \"evidence/data/q7-canary-rollback.csv\"  # t0 = 10:46:49 UTC; weight 10 from 10:50:18 to 10:51:18
+print(\"rollback weight 10 seconds 212 - 268\", share(f, 212, 268))
+"
+promote weight 10 seconds 160 - 186 canary=169 primary=1512 share=10.05% canary_5xx=0
+promote weight 20 seconds 190 - 216 canary=336 primary=1342 share=20.02% canary_5xx=0
+promote weight 30 seconds 220 - 246 canary=505 primary=1180 share=29.97% canary_5xx=0
+promote weight 40 seconds 250 - 276 canary=677 primary=1018 share=39.94% canary_5xx=0
+promote weight 50 seconds 280 - 306 canary=846 primary=845 share=50.03% canary_5xx=0
+promote weight 50 (Promoting) seconds 310 - 336 canary=843 primary=837 share=50.18% canary_5xx=0
+promote weight 0 seconds 342 - 600 canary=0 primary=16536 share=0.00% canary_5xx=0
+rollback weight 10 seconds 212 - 268 canary=363 primary=3275 share=9.98% canary_5xx=86
+[exit 0]

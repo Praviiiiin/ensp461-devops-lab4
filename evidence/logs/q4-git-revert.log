@@ -1,0 +1,14 @@
+
+# 2026-11-26 15:50:20 IST
+$ git log -2 --format='%h %an %s'; date -u +%T; ./scripts/wait-http.sh bg.shortlink.test /healthz 404; flux get ks apps; kubectl -n sl-bg get httproute shortlink
+be738b0 E Pravin Revert "Serve the blue-green environment on bg.shortlink.test as well"
+631990c E Pravin Serve the blue-green environment on bg.shortlink.test as well
+10:20:20
+10:20:20 +0s HTTP 200
+10:22:03 +103s HTTP 404
+back to HTTP 404 after 103s
+NAME	REVISION          	SUSPENDED	READY	MESSAGE                              
+apps	main@sha1:be738b0d	False    	True 	Applied revision: main@sha1:be738b0d	
+NAME        HOSTNAMES                      AGE
+shortlink   ["bluegreen.shortlink.test"]   10m
+[exit 0]

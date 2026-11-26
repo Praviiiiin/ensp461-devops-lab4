@@ -1,0 +1,1 @@
+probe canary.shortlink.test 420s: requests=27250 ok=27156 5xx=94 conn_errors=0 other=0 slow(>0.5s)=0 availability=99.655% seconds_with_errors=49 v2.1.0=26859 v2.1.0-fault=389

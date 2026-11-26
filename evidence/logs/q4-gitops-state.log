@@ -1,0 +1,62 @@
+
+# 2026-11-26 15:37:18 IST
+$ flux version; flux get sources git; flux get sources helm -A; flux get kustomizations; flux get helmreleases -A; flux tree kustomization flux-system --compact | head -60; kubectl get canary,hpa,httproute -A
+flux: v2.10.1
+distribution: flux-v2.10.1
+helm-controller: v1.7.2
+kustomize-controller: v1.10.2
+notification-controller: v1.10.1
+source-controller: v1.10.2
+NAME       	REVISION          	SUSPENDED	READY	MESSAGE                                           
+flux-system	main@sha1:a78d0d8d	False    	True 	stored artifact for revision 'main@sha1:a78d0d8d'	
+NAMESPACE           	NAME                	REVISION       	SUSPENDED	READY	MESSAGE                                     
+envoy-gateway-system	envoy-gateway       	               	False    	True 	Helm repository is Ready                   	
+flagger-system      	flagger             	sha256:9b4046fc	False    	True 	stored artifact: revision 'sha256:9b4046fc'	
+monitoring          	grafana             	sha256:a4f8871a	False    	True 	stored artifact: revision 'sha256:a4f8871a'	
+monitoring          	metrics-server      	sha256:a09c080a	False    	True 	stored artifact: revision 'sha256:a09c080a'	
+monitoring          	prometheus-community	sha256:20c94880	False    	True 	stored artifact: revision 'sha256:20c94880'	
+NAME             	REVISION          	SUSPENDED	READY	MESSAGE                              
+apps             	main@sha1:a78d0d8d	False    	True 	Applied revision: main@sha1:a78d0d8d	
+data             	main@sha1:a78d0d8d	False    	True 	Applied revision: main@sha1:a78d0d8d	
+flux-system      	main@sha1:a78d0d8d	False    	True 	Applied revision: main@sha1:a78d0d8d	
+infra-configs    	main@sha1:a78d0d8d	False    	True 	Applied revision: main@sha1:a78d0d8d	
+infra-controllers	main@sha1:a78d0d8d	False    	True 	Applied revision: main@sha1:a78d0d8d	
+NAMESPACE           	NAME          	REVISION	SUSPENDED	READY	MESSAGE                                                                                                       
+envoy-gateway-system	envoy-gateway 	1.10.0  	False    	True 	Helm install succeeded for release envoy-gateway-system/envoy-gateway.v1 with chart gateway-helm@1.10.0      	
+flagger-system      	flagger       	1.45.0  	False    	True 	Helm install succeeded for release flagger-system/flagger.v1 with chart flagger@1.45.0                       	
+flagger-system      	loadtester    	0.39.0  	False    	True 	Helm install succeeded for release flagger-system/loadtester.v1 with chart loadtester@0.39.0                 	
+monitoring          	grafana       	10.5.15 	False    	True 	Helm install succeeded for release monitoring/grafana.v1 with chart grafana@10.5.15                          	
+monitoring          	metrics-server	3.14.0  	False    	True 	Helm install succeeded for release kube-system/kube-system-metrics-server.v1 with chart metrics-server@3.14.0	
+monitoring          	prometheus    	30.0.1  	False    	True 	Helm upgrade succeeded for release monitoring/prometheus.v2 with chart prometheus@30.0.1                     	
+Kustomization/flux-system/flux-system
+├── Kustomization/flux-system/apps
+├── Kustomization/flux-system/data
+├── Kustomization/flux-system/infra-configs
+├── Kustomization/flux-system/infra-controllers
+│   ├── HelmRelease/envoy-gateway-system/envoy-gateway
+│   ├── HelmRelease/flagger-system/flagger
+│   ├── HelmRelease/flagger-system/loadtester
+│   ├── HelmRelease/monitoring/grafana
+│   ├── HelmRelease/monitoring/metrics-server
+│   ├── HelmRelease/monitoring/prometheus
+│   ├── HelmRepository/envoy-gateway-system/envoy-gateway
+│   ├── HelmRepository/flagger-system/flagger
+│   ├── HelmRepository/monitoring/grafana
+│   ├── HelmRepository/monitoring/metrics-server
+│   └── HelmRepository/monitoring/prometheus-community
+└── GitRepository/flux-system/flux-system
+
+NAMESPACE   NAME                           STATUS        WEIGHT   LASTTRANSITIONTIME
+sl-bg       canary.flagger.app/shortlink   Initialized   0        2026-11-26T10:06:21Z
+sl-canary   canary.flagger.app/shortlink   Initialized   0        2026-11-26T10:06:36Z
+
+NAMESPACE   NAME                                                    REFERENCE                      TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+sl-bg       horizontalpodautoscaler.autoscaling/shortlink           Deployment/shortlink           cpu: <unknown>/80%   2         4         0          80s
+sl-bg       horizontalpodautoscaler.autoscaling/shortlink-primary   Deployment/shortlink-primary   cpu: 4%/80%          2         4         2          57s
+sl-canary   horizontalpodautoscaler.autoscaling/shortlink           Deployment/shortlink           cpu: <unknown>/80%   2         4         0          80s
+sl-canary   horizontalpodautoscaler.autoscaling/shortlink-primary   Deployment/shortlink-primary   cpu: 4%/80%          2         4         2          42s
+
+NAMESPACE   NAME                                            HOSTNAMES                      AGE
+sl-bg       httproute.gateway.networking.k8s.io/shortlink   ["bluegreen.shortlink.test"]   80s
+sl-canary   httproute.gateway.networking.k8s.io/shortlink   ["canary.shortlink.test"]      42s
+[exit 0]

@@ -1,0 +1,45 @@
+
+# 2026-11-26 16:18:38 IST
+$ echo "pushed at $(cat evidence/data/q7-canary-rollback.pushed-at) UTC"; ./scripts/watch-canary.sh sl-canary 600
+pushed at 10:46:49 UTC
+10:48:38 +0s Succeeded weight=0 failedChecks=0 iterations=0
+10:49:19 +41s Progressing weight=0 failedChecks=0 iterations=0
+10:49:50 +72s Progressing weight=0 failedChecks=1 iterations=0
+10:50:19 +101s Progressing weight=10 failedChecks=1 iterations=0
+10:50:50 +132s Progressing weight=10 failedChecks=2 iterations=0
+10:51:18 +160s Failed weight=0 failedChecks=0 iterations=0
+[exit 0]
+
+# 2026-11-26 16:21:27 IST
+$ kubectl -n sl-canary get canary shortlink; kubectl -n flagger-system logs deploy/flagger --since=10m | python3 -c 'import sys,json
+for l in sys.stdin:
+    try: d=json.loads(l)
+    except ValueError: continue
+    if d.get("canary")=="shortlink.sl-canary": print(d["ts"][11:19], d["level"], d["msg"])'; kubectl -n sl-canary get deploy -o custom-columns=NAME:.metadata.name,REPLICAS:.spec.replicas,IMAGE:.spec.template.spec.containers[0].image
+NAME        STATUS   WEIGHT   LASTTRANSITIONTIME
+shortlink   Failed   0        2026-11-26T10:51:18Z
+10:43:18 info Advance shortlink.sl-canary canary weight 50
+10:43:48 info Copying shortlink.sl-canary template spec to shortlink-primary.sl-canary
+10:43:48 info Secret shortlink-secrets-primary synced
+10:44:18 info HorizontalPodAutoscaler v2 shortlink-primary.sl-canary updated
+10:44:18 info Routing all traffic to primary
+10:44:48 info Promotion completed! Scaling down shortlink.sl-canary
+10:49:18 info New revision detected! Scaling up shortlink.sl-canary
+10:49:48 info Starting canary analysis for shortlink.sl-canary
+10:49:48 info Halt shortlink.sl-canary advancement pre-rollout check acceptance-test failed POST http://loadtester.flagger-system/ giving up after 1 attempt(s)
+10:50:18 info Starting canary analysis for shortlink.sl-canary
+10:50:18 info Pre-rollout check acceptance-test passed
+10:50:18 info Advance shortlink.sl-canary canary weight 10
+10:50:48 info Halt shortlink.sl-canary advancement error-rate-percent 18.72 > 1
+10:51:18 info Rolling back shortlink.sl-canary failed checks threshold reached 2
+10:51:18 info Canary failed! Scaling down shortlink.sl-canary
+NAME                REPLICAS   IMAGE
+shortlink           0          ghcr.io/praviiiiin/shortlink-lab4:2.1.0-fbefde2
+shortlink-primary   2          ghcr.io/praviiiiin/shortlink-lab4:2.1.0-fbefde2
+[exit 0]
+
+# 2026-11-26 16:24:01 IST
+$ ./scripts/prom-range.sh 'flagger_canary_weight{namespace="sl-canary"}' 1795690009 1795690428 evidence/data/q7-canary-rollback-weights.json; ./scripts/prom-range.sh 'sum by (version) (rate(shortlink_http_requests_total{namespace="sl-canary",route!~"/healthz|/readyz|/metrics",status=~"5.."}[30s]))' 1795690009 1795690428 evidence/data/q7-canary-rollback-5xx-by-version.json
+evidence/data/q7-canary-rollback-weights.json success 2 series
+evidence/data/q7-canary-rollback-5xx-by-version.json success 1 series
+[exit 0]

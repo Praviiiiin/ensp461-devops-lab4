@@ -1,0 +1,14 @@
+
+# 2026-11-26 15:40:00 IST
+$ kubectl -n sl-bg get httproute shortlink; kubectl -n sl-bg delete httproute shortlink; ./scripts/wait-http.sh bluegreen.shortlink.test /healthz 200; kubectl -n sl-bg get httproute shortlink; kubectl get events -n flux-system --field-selector involvedObject.name=apps --sort-by=.lastTimestamp | tail -2
+NAME        HOSTNAMES                      AGE
+shortlink   ["bluegreen.shortlink.test"]   5s
+httproute.gateway.networking.k8s.io "shortlink" deleted from sl-bg namespace
+10:10:00 +0s HTTP 404
+10:11:56 +116s HTTP 200
+back to HTTP 200 after 116s
+NAME        HOSTNAMES                      AGE
+shortlink   ["bluegreen.shortlink.test"]   1s
+2m32s       Normal   DependencyNotReady        kustomization/apps   Dependencies do not meet ready condition, retrying in 30s
+2m2s        Normal   Progressing               kustomization/apps   HTTPRoute/sl-bg/shortlink created
+[exit 0]

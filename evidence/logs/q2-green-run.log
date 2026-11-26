@@ -1,0 +1,45 @@
+
+# 2026-11-26 15:41:50 IST
+$ export GH_TOKEN=$(gh auth token -u Praviiiiin); R=Praviiiiin/ensp461-devops-lab4; gh run view 45798477435 -R $R; gh run view 45798477435 -R $R --log | cut -f2- | grep -E "passed|PASSED|no leaks|leaks found|commits scanned|smoke test passed|x-shortlink-version|pushing manifest|naming to|digest: sha256|exporting manifest list" | sed -E "s/[0-9-]{10}T[0-9:.]+Z //" | head -40; gh run list -R $R --limit 5
+
+✓ main ci · 45798477435
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ gate 3 - gitleaks (full history) in 15s (ID 139835169199)
+✓ gate 1 - lint and unit tests in 13s (ID 139835169464)
+✓ gate 2 - integration tests (PostgreSQL) in 32s (ID 139835169648)
+✓ build and push arm64 image in 32s (ID 139835484035)
+✓ deploy gate - smoke test pushed image in 15s (ID 139835818340)
+
+ANNOTATIONS
+! Docker network rm failed with exit code 1
+deploy gate - smoke test pushed image: .github#68
+
+
+ARTIFACTS
+Praviiiiin~ensp461-devops-lab4~S13NAT.dockerbuild
+
+For more information about a job, try: gh run view --job=<job-id>
+View this run on GitHub: https://github.com/Praviiiiin/ensp461-devops-lab4/actions/runs/45798477435
+Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose	^[[90m10:08AM^[[0m ^[[32mINF^[[0m ^[[1m12 commits scanned.^[[0m
+Run docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 git /repo --redact --verbose	^[[90m10:08AM^[[0m ^[[32mINF^[[0m ^[[1mno leaks found^[[0m
+Run ruff check . && ruff format --check .	All checks passed!
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	27 passed, 4 deselected in 0.90s
+Run pytest -m integration -v	tests/test_integration.py::test_ready_against_real_db PASSED             [ 25%]
+Run pytest -m integration -v	tests/test_integration.py::test_round_trip_persists_hits PASSED          [ 50%]
+Run pytest -m integration -v	tests/test_integration.py::test_duplicate_code_raises_code_taken PASSED  [ 75%]
+Run pytest -m integration -v	tests/test_integration.py::test_delete_removes_row PASSED                [100%]
+Run pytest -m integration -v	======================= 4 passed, 27 deselected in 0.78s =======================
+Run docker/build-push-action@v7	#18 exporting manifest list sha256:09a2e10b4facf4e1203614f7db8227613fb1a2e136fa346a2cd275a4fcdb3df0 done
+Run docker/build-push-action@v7	#18 pushing manifest for ghcr.io/praviiiiin/shortlink-lab4:2.1.0-fbefde2@sha256:09a2e10b4facf4e1203614f7db8227613fb1a2e136fa346a2cd275a4fcdb3df0
+Run docker/build-push-action@v7	#18 pushing manifest for ghcr.io/praviiiiin/shortlink-lab4:2.1.0-fbefde2@sha256:09a2e10b4facf4e1203614f7db8227613fb1a2e136fa346a2cd275a4fcdb3df0 2.9s done
+Run the exact pushed image (by digest) against PostgreSQL	^[[36;1mcurl -sI localhost:8080/healthz | grep -i x-shortlink-version^[[0m
+Run the exact pushed image (by digest) against PostgreSQL	^[[36;1mecho "smoke test passed for $REF"^[[0m
+Run the exact pushed image (by digest) against PostgreSQL	smoke test passed for ghcr.io/praviiiiin/shortlink-lab4@sha256:09a2e10b4facf4e1203614f7db8227613fb1a2e136fa346a2cd275a4fcdb3df0
+completed	success	Restore the 2048-character URL limit dropped in 2.1.0	ci	main	push	45798477435	2m34s	2026-11-26T10:08:13Z
+completed	failure	Release 2.1.0: strip whitespace and reject credential URLs	ci	main	push	45798321003	26s	2026-11-26T10:07:15Z
+completed	success	Report the serving pod in an X-Served-By header	ci	main	push	45796358231	2m30s	2026-11-26T09:54:41Z
+completed	success	Use Node 24 action releases and a timed deploy environment	ci	main	push	45795643881	2m16s	2026-11-26T09:50:05Z
+completed	cancelled	Add CI/CD pipeline with test, secret-scan and deploy gates	ci	main	push	45795139678	3m3s	2026-11-26T09:46:49Z
+[exit 0]

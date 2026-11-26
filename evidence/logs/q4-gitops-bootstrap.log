@@ -1,0 +1,147 @@
+
+# 2026-11-26 15:26:01 IST
+$ ./platform/bootstrap.sh
+Switched to context "kind-pv-lab4".
+namespace/flux-system created
+secret/sops-age created
+namespace/flux-system serverside-applied
+resourcequota/critical-pods-flux-system serverside-applied
+customresourcedefinition.apiextensions.k8s.io/alerts.notification.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/externalartifacts.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmcharts.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmreleases.helm.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmrepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/ocirepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/providers.notification.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/receivers.notification.toolkit.fluxcd.io serverside-applied
+serviceaccount/helm-controller serverside-applied
+serviceaccount/kustomize-controller serverside-applied
+serviceaccount/notification-controller serverside-applied
+serviceaccount/source-controller serverside-applied
+clusterrole.rbac.authorization.k8s.io/crd-controller-flux-system serverside-applied
+clusterrole.rbac.authorization.k8s.io/flux-edit-flux-system serverside-applied
+clusterrole.rbac.authorization.k8s.io/flux-view-flux-system serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/cluster-reconciler-flux-system serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/crd-controller-flux-system serverside-applied
+service/notification-controller serverside-applied
+service/source-controller serverside-applied
+service/webhook-receiver serverside-applied
+deployment.apps/helm-controller serverside-applied
+deployment.apps/kustomize-controller serverside-applied
+deployment.apps/notification-controller serverside-applied
+deployment.apps/source-controller serverside-applied
+networkpolicy.networking.k8s.io/allow-egress serverside-applied
+networkpolicy.networking.k8s.io/allow-scraping serverside-applied
+networkpolicy.networking.k8s.io/allow-webhooks serverside-applied
+resource mapping not found for name: "flux-system" namespace: "flux-system" from "clusters/pv-lab4/flux-system": no matches for kind "Kustomization" in version "kustomize.toolkit.fluxcd.io/v1"
+ensure CRDs are installed first
+resource mapping not found for name: "flux-system" namespace: "flux-system" from "clusters/pv-lab4/flux-system": no matches for kind "GitRepository" in version "source.toolkit.fluxcd.io/v1"
+ensure CRDs are installed first
+[exit 1]
+
+# 2026-11-26 15:26:08 IST
+$ ./platform/bootstrap.sh
+Switched to context "kind-pv-lab4".
+namespace/flux-system configured
+secret/sops-age unchanged
+namespace/flux-system serverside-applied
+resourcequota/critical-pods-flux-system serverside-applied
+customresourcedefinition.apiextensions.k8s.io/alerts.notification.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/externalartifacts.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmcharts.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmreleases.helm.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmrepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/ocirepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/providers.notification.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/receivers.notification.toolkit.fluxcd.io serverside-applied
+serviceaccount/helm-controller serverside-applied
+serviceaccount/kustomize-controller serverside-applied
+serviceaccount/notification-controller serverside-applied
+serviceaccount/source-controller serverside-applied
+clusterrole.rbac.authorization.k8s.io/crd-controller-flux-system serverside-applied
+clusterrole.rbac.authorization.k8s.io/flux-edit-flux-system serverside-applied
+clusterrole.rbac.authorization.k8s.io/flux-view-flux-system serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/cluster-reconciler-flux-system serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/crd-controller-flux-system serverside-applied
+service/notification-controller serverside-applied
+service/source-controller serverside-applied
+service/webhook-receiver serverside-applied
+deployment.apps/helm-controller serverside-applied
+deployment.apps/kustomize-controller serverside-applied
+deployment.apps/notification-controller serverside-applied
+deployment.apps/source-controller serverside-applied
+kustomization.kustomize.toolkit.fluxcd.io/flux-system serverside-applied
+networkpolicy.networking.k8s.io/allow-egress serverside-applied
+networkpolicy.networking.k8s.io/allow-scraping serverside-applied
+networkpolicy.networking.k8s.io/allow-webhooks serverside-applied
+gitrepository.source.toolkit.fluxcd.io/flux-system serverside-applied
+customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io condition met
+customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io condition met
+namespace/flux-system serverside-applied
+resourcequota/critical-pods-flux-system serverside-applied
+customresourcedefinition.apiextensions.k8s.io/alerts.notification.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/externalartifacts.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmcharts.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmreleases.helm.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/helmrepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/ocirepositories.source.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/providers.notification.toolkit.fluxcd.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/receivers.notification.toolkit.fluxcd.io serverside-applied
+serviceaccount/helm-controller serverside-applied
+serviceaccount/kustomize-controller serverside-applied
+serviceaccount/notification-controller serverside-applied
+serviceaccount/source-controller serverside-applied
+clusterrole.rbac.authorization.k8s.io/crd-controller-flux-system serverside-applied
+clusterrole.rbac.authorization.k8s.io/flux-edit-flux-system serverside-applied
+clusterrole.rbac.authorization.k8s.io/flux-view-flux-system serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/cluster-reconciler-flux-system serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/crd-controller-flux-system serverside-applied
+service/notification-controller serverside-applied
+service/source-controller serverside-applied
+service/webhook-receiver serverside-applied
+deployment.apps/helm-controller serverside-applied
+deployment.apps/kustomize-controller serverside-applied
+deployment.apps/notification-controller serverside-applied
+deployment.apps/source-controller serverside-applied
+kustomization.kustomize.toolkit.fluxcd.io/flux-system serverside-applied
+networkpolicy.networking.k8s.io/allow-egress serverside-applied
+networkpolicy.networking.k8s.io/allow-scraping serverside-applied
+networkpolicy.networking.k8s.io/allow-webhooks serverside-applied
+gitrepository.source.toolkit.fluxcd.io/flux-system serverside-applied
+► checking prerequisites
+✔ Kubernetes 1.37.0 >=1.35.0-0
+► checking version in cluster
+✔ distribution: flux-v2.10.1
+✔ bootstrapped: false
+► checking controllers
+✔ helm-controller: deployment ready
+► ghcr.io/fluxcd/helm-controller:v1.7.2
+✔ kustomize-controller: deployment ready
+► ghcr.io/fluxcd/kustomize-controller:v1.10.2
+✔ notification-controller: deployment ready
+► ghcr.io/fluxcd/notification-controller:v1.10.1
+✔ source-controller: deployment ready
+► ghcr.io/fluxcd/source-controller:v1.10.2
+► checking crds
+✔ alerts.notification.toolkit.fluxcd.io/v1
+✔ buckets.source.toolkit.fluxcd.io/v1
+✔ externalartifacts.source.toolkit.fluxcd.io/v1
+✔ gitrepositories.source.toolkit.fluxcd.io/v1
+✔ helmcharts.source.toolkit.fluxcd.io/v1
+✔ helmreleases.helm.toolkit.fluxcd.io/v2
+✔ helmrepositories.source.toolkit.fluxcd.io/v1
+✔ kustomizations.kustomize.toolkit.fluxcd.io/v1
+✔ ocirepositories.source.toolkit.fluxcd.io/v1
+✔ providers.notification.toolkit.fluxcd.io/v1
+✔ receivers.notification.toolkit.fluxcd.io/v1
+✔ all checks passed
+[exit 0]

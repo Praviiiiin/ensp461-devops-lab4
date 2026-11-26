@@ -1,0 +1,38 @@
+
+# 2026-11-26 15:37:53 IST
+$ export GH_TOKEN=$(gh auth token -u Praviiiiin); gh run view 45798321003 -R Praviiiiin/ensp461-devops-lab4; gh run view 45798321003 -R Praviiiiin/ensp461-devops-lab4 --log-failed | cut -f2- | sed -E "s/^[0-9T:.-]+Z //" | grep -E "FAILED|assert|passed|failed|Error|longer" | head -20
+
+X main ci · 45798321003
+Triggered via push less than a minute ago
+
+JOBS
+✓ gate 3 - gitleaks (full history) in 8s (ID 139834632010)
+X gate 1 - lint and unit tests in 18s (ID 139834632485)
+  ✓ Set up job
+  ✓ Run actions/checkout@v7
+  ✓ Run actions/setup-python@v7
+  ✓ Run pip install -r requirements-dev.txt
+  ✓ Run ruff check . && ruff format --check .
+  X Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q
+  - Post Run actions/setup-python@v7
+  ✓ Post Run actions/checkout@v7
+  ✓ Complete job
+✓ gate 2 - integration tests (PostgreSQL) in 22s (ID 139834632554)
+- build and push arm64 image in 0s (ID 139834861822)
+- deploy gate - smoke test pushed image in 0s (ID 139834863448)
+
+ANNOTATIONS
+X Process completed with exit code 1.
+gate 1 - lint and unit tests: .github#55
+
+
+To see what failed, try: gh run view 45798321003 --log-failed
+View this run on GitHub: https://github.com/Praviiiiin/ensp461-devops-lab4/actions/runs/45798321003
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3458680Z _______________________ test_valid_url[longer-than-2048] _______________________
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3470672Z             pytest.param("https://x.io/" + "a" * 2100, False, id="longer-than-2048"),
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3474838Z >       assert valid_url(url) is ok
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3475195Z E       AssertionError: assert True is False
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3478989Z tests/test_app.py:54: AssertionError
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3486420Z FAILED tests/test_app.py::test_valid_url[longer-than-2048] - AssertionError: assert True is False
+Run pytest -m "not integration" --cov --cov-report=term-missing --cov-fail-under=80 -q	2026-11-26T10:07:36.3490393Z 1 failed, 26 passed, 4 deselected in 0.91s
+[exit 0]

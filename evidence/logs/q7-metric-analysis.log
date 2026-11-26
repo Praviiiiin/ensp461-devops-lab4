@@ -1,0 +1,38 @@
+
+# 2026-11-26 16:46:15 IST
+$ for w in "rollback 1795690009 1795690428" "promote 1795690451 1795691050"; do set -- $w; echo "== $1 window $(date -u -r $2 +%T)-$(date -u -r $3 +%T) UTC: flagger_canary_metric_analysis (value Flagger last evaluated, printed when it changes)"; curl -s -G http://localhost:8491/api/v1/query_range --data-urlencode "query=flagger_canary_metric_analysis{namespace=\"sl-canary\"}" --data-urlencode start=$2 --data-urlencode end=$3 --data-urlencode step=5 | python3 -c "
+import json,sys,time
+for r in json.load(sys.stdin)[\"data\"][\"result\"]:
+    prev=None
+    for t,v in r[\"values\"]:
+        if v!=prev: print(time.strftime(\"%H:%M:%S\",time.gmtime(t)), r[\"metric\"][\"metric\"], round(float(v),2)); prev=v
+"; done
+== rollback window 10:46:49-10:53:48 UTC: flagger_canary_metric_analysis (value Flagger last evaluated, printed when it changes)
+10:46:49 error-rate-percent -0.0
+10:50:54 error-rate-percent 18.72
+10:46:49 p95-latency-ms 15.06
+== promote window 10:54:11-11:04:10 UTC: flagger_canary_metric_analysis (value Flagger last evaluated, printed when it changes)
+10:54:11 error-rate-percent 18.72
+10:57:21 error-rate-percent 0.0
+10:54:11 p95-latency-ms 15.06
+10:57:21 p95-latency-ms 9.33
+10:57:51 p95-latency-ms 9.64
+10:58:21 p95-latency-ms 9.68
+10:58:51 p95-latency-ms 9.64
+10:59:21 p95-latency-ms 9.44
+[exit 0]
+
+
+# 2026-11-26 16:46:35 IST
+$ E="100 - 100 * sum(rate(shortlink_http_requests_total{namespace=\"sl-canary\",pod=~\"shortlink-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)\",route!~\"/healthz|/readyz|/metrics\",status!~\"5..\"}[1m])) / sum(rate(shortlink_http_requests_total{namespace=\"sl-canary\",pod=~\"shortlink-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)\",route!~\"/healthz|/readyz|/metrics\"}[1m]))"; P="1000 * histogram_quantile(0.95, sum by (le) (rate(shortlink_http_request_duration_seconds_bucket{namespace=\"sl-canary\",pod=~\"shortlink-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)\",route!~\"/healthz|/readyz|/metrics\"}[1m])))"; for q in "rollback error-rate-percent 1795690009 1795690428 E" "promote error-rate-percent 1795690451 1795691050 E" "promote p95-latency-ms 1795690451 1795691050 P"; do set -- $q; [ $5 = E ] && expr=$E || expr=$P; echo "== $1: $2 MetricTemplate query (namespace=sl-canary, target=shortlink, interval=1m), 10 s step, canary pods only"; curl -s -G http://localhost:8491/api/v1/query_range --data-urlencode "query=$expr" --data-urlencode start=$3 --data-urlencode end=$4 --data-urlencode step=10 | python3 -c "
+import json,sys,time
+for r in json.load(sys.stdin)[\"data\"][\"result\"]:
+    print(\" \".join(time.strftime(\"%H:%M:%S\",time.gmtime(t))+\"=\"+str(round(float(v),2)) for t,v in r[\"values\"] if v!=\"NaN\"))
+"; done
+== rollback: error-rate-percent MetricTemplate query (namespace=sl-canary, target=shortlink, interval=1m), 10 s step, canary pods only
+10:50:29=34.21 10:50:39=17.68 10:50:49=18.64 10:50:59=20.56 10:51:09=21.69 10:51:19=20.72 10:51:29=19.87 10:51:39=21.01 10:51:49=20.22 10:51:59=17.54 10:52:09=14.45
+== promote: error-rate-percent MetricTemplate query (namespace=sl-canary, target=shortlink, interval=1m), 10 s step, canary pods only
+10:57:01=0.0 10:57:11=0.0 10:57:21=0.0 10:57:31=0.0 10:57:41=0.0 10:57:51=0.0 10:58:01=0.0 10:58:11=0.0 10:58:21=0.0 10:58:31=0.0 10:58:41=0.0 10:58:51=0.0 10:59:01=0.0 10:59:11=0.0 10:59:21=0.0 10:59:31=0.0 10:59:41=0.0 10:59:51=0.0 11:00:01=0.0 11:00:11=0.0 11:00:21=0.0 11:00:31=0.0 11:00:41=0.0
+== promote: p95-latency-ms MetricTemplate query (namespace=sl-canary, target=shortlink, interval=1m), 10 s step, canary pods only
+10:57:01=9.37 10:57:11=9.17 10:57:21=9.27 10:57:31=9.55 10:57:41=9.64 10:57:51=9.67 10:58:01=9.69 10:58:11=9.7 10:58:21=9.74 10:58:31=9.75 10:58:41=9.67 10:58:51=9.63 10:59:01=9.55 10:59:11=9.5 10:59:21=9.41 10:59:31=9.45 10:59:41=9.52 10:59:51=9.53 11:00:01=9.59 11:00:11=9.69 11:00:21=9.7 11:00:31=9.66 11:00:41=9.54
+[exit 0]
