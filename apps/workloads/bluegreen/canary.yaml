@@ -1,17 +1,22 @@
-# Blue-green with Kubernetes Service switching: the new version (green, Deployment "shortlink")
-# is started next to the live one (blue, "shortlink-primary"), tested in isolation through
-# shortlink-canary for 6 iterations, then the "shortlink" Service is switched to it in one step.
+# Blue-green on the Gateway API: the new version (green, Deployment "shortlink") runs next to
+# the live one (blue, "shortlink-primary") with 0% of users, is tested in isolation through
+# shortlink-canary for 6 iterations, then the HTTPRoute flips 100% of users to green in one step.
+# Flagger then rolls the new spec into the primary and flips users back to it.
+# (The first run used provider "kubernetes": its apex Service never left the primary, so the
+# "switch" was really a rolling update of the primary - see the Q3 report.)
 apiVersion: flagger.app/v1beta1
 kind: Canary
 metadata: { name: shortlink }
 spec:
-  provider: kubernetes
+  provider: gatewayapi:v1
   targetRef: { apiVersion: apps/v1, kind: Deployment, name: shortlink }
   autoscalerRef: { apiVersion: autoscaling/v2, kind: HorizontalPodAutoscaler, name: shortlink }
   progressDeadlineSeconds: 300
   service:
     port: 80
     targetPort: 8080
+    hosts: [bluegreen.shortlink.test]
+    gatewayRefs: [{ name: public, namespace: envoy-gateway-system }]
   analysis:
     interval: 15s
     threshold: 2

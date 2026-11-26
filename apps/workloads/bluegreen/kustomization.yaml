@@ -6,7 +6,6 @@ resources:
   - shortlink-secrets.sops.yaml
   - ../base
   - canary.yaml
-  - httproute.yaml
 images:
   - name: ghcr.io/praviiiiin/shortlink-lab4
     newTag: 2.2.0-1b807fa  # promotion = changing this line in Git
