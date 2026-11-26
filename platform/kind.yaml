@@ -1,0 +1,13 @@
+# Single-node kind cluster for Lab 4.
+# create with: KIND_EXPERIMENTAL_DOCKER_NETWORK=pv-lab4-net kind create cluster --config platform/kind.yaml
+# Host port 8480 reaches the Envoy Gateway data plane (NodePort 30080),
+# 8490 reaches Grafana (NodePort 30090) and 8491 reaches Prometheus (NodePort 30091).
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: pv-lab4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - { containerPort: 30080, hostPort: 8480, protocol: TCP }
+      - { containerPort: 30090, hostPort: 8490, protocol: TCP }
+      - { containerPort: 30091, hostPort: 8491, protocol: TCP }

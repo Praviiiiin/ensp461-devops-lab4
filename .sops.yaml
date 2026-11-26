@@ -1,0 +1,6 @@
+# Only the data/stringData of Kubernetes Secrets is encrypted; keys, kinds and names stay
+# readable for review. The matching age private key lives only in the cluster (flux-system/sops-age).
+creation_rules:
+  - path_regex: .*\.sops\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    age: age15pmkew2azjs05juq9g9l5gz7e9fjh4jysjy9aucescntzkyeqp5qef9uw5
