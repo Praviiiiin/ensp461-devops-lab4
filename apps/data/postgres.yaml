@@ -1,5 +1,6 @@
 # PostgreSQL 17 pair with asynchronous streaming replication.
-# pg-a starts as primary (initdb + roles); pg-b clones pg-a with pg_basebackup -R and streams.
+# The member with an empty PRIMARY_HOST is the primary; the other clones it with pg_basebackup -R
+# and streams. pg-a was the first primary; pg-b took over in the Q1 failover drill.
 # The "pg" Service pins the writable member by pod name, so a failover is a reviewed Git change
 # (selector edit) plus an imperative pg_promote() - see scripts/pg-failover.sh.
 apiVersion: v1
@@ -15,17 +16,18 @@ apiVersion: v1
 kind: Service
 metadata: { name: pg }
 spec:
-  selector: { app: pg, statefulset.kubernetes.io/pod-name: pg-a-0 }
+  # Writable member. Failover drill 2026-11-26: pg-a-0 crashed, pg-b-0 was promoted.
+  selector: { app: pg, statefulset.kubernetes.io/pod-name: pg-b-0 }
   ports: [{ name: pg, port: 5432 }]
 ---
 apiVersion: v1
 kind: Service
 metadata: { name: pg-standby }
 spec:
-  selector: { app: pg, statefulset.kubernetes.io/pod-name: pg-b-0 }
+  selector: { app: pg, statefulset.kubernetes.io/pod-name: pg-a-0 }
   ports: [{ name: pg, port: 5432 }]
 ---
-# Initial primary.
+# Former primary; after the failover it re-seeds from pg-b-0 as the hot standby.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata: { name: pg-a }
@@ -62,7 +64,7 @@ spec:
             valueFrom: { secretKeyRef: { name: pg-credentials, key: replication-password } }
           - name: APP_PASSWORD
             valueFrom: { secretKeyRef: { name: pg-credentials, key: app-password } }
-          - { name: PRIMARY_HOST, value: "" }
+          - { name: PRIMARY_HOST, value: pg-b-0.pg-hl }
           volumeMounts:
             - { name: data, mountPath: /var/lib/postgresql/data }
             - { name: scripts, mountPath: /scripts }
@@ -99,7 +101,7 @@ spec:
         accessModes: [ReadWriteOnce]
         resources: { requests: { storage: 2Gi } }
 ---
-# Initial hot standby, seeded from pg-a.
+# Primary since the failover drill (promoted with pg_promote()).
 apiVersion: apps/v1
 kind: StatefulSet
 metadata: { name: pg-b }
@@ -136,7 +138,7 @@ spec:
             valueFrom: { secretKeyRef: { name: pg-credentials, key: replication-password } }
           - name: APP_PASSWORD
             valueFrom: { secretKeyRef: { name: pg-credentials, key: app-password } }
-          - { name: PRIMARY_HOST, value: pg-a-0.pg-hl }
+          - { name: PRIMARY_HOST, value: "" }
           volumeMounts:
             - { name: data, mountPath: /var/lib/postgresql/data }
             - { name: scripts, mountPath: /scripts }
