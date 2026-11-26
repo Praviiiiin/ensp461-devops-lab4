@@ -126,11 +126,14 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' -XDELETE -H "Authorization: Bearer $ADMIN_TOKEN" localhost:8080/api/links/$code)" = 204
           curl -sI localhost:8080/healthz | grep -i x-shortlink-version
           echo "smoke test passed for $REF"
+      - name: Remove the smoke container
+        if: always()
+        run: docker rm -f smoke || true  # frees the service network so job cleanup succeeds
       - name: Promotion instructions
         run: |
           {
             echo "### Image ready for GitOps promotion"
             echo "\`${{ env.IMAGE }}:${{ needs.build.outputs.tag }}\`"
             echo "digest \`${{ needs.build.outputs.digest }}\`"
-            echo "Promote by setting this tag in deploy/apps/*/kustomization.yaml; Flux reconciles the cluster."
+            echo "Promote by setting this tag in apps/workloads/*/kustomization.yaml; Flux reconciles the cluster."
           } >> "$GITHUB_STEP_SUMMARY"
