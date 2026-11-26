@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#374151;stroke-width:1.4}
+      .blue{fill:#eff6ff;stroke:#2563eb;stroke-width:1.6}
+      .green{fill:#f0fdf4;stroke:#16a34a;stroke-width:1.6}
+      .t{font-weight:bold;font-size:14px;fill:#111827}
+      .s{font-size:12px;fill:#4b5563}
+      .h{font-weight:bold;font-size:13px;fill:#374151}
+      .l{stroke:#374151;stroke-width:1.4;fill:none;marker-end:url(#a)}
+      .d{stroke:#9ca3af;stroke-width:1.4;fill:none;stroke-dasharray:5 4;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="330" fill="#ffffff"/>
+  <!-- phase 1 -->
+  <text x="20" y="28" class="h">1. Analysis: users stay on blue</text>
+  <rect x="20" y="44" width="280" height="40" rx="8" class="box"/>
+  <text x="34" y="69" class="s">Service shortlink -> app=shortlink-primary</text>
+  <rect x="20" y="120" width="130" height="54" rx="8" class="blue"/>
+  <text x="32" y="142" class="t">blue</text><text x="32" y="160" class="s">primary, v2.0.0</text>
+  <rect x="170" y="120" width="130" height="54" rx="8" class="green"/>
+  <text x="182" y="142" class="t">green</text><text x="182" y="160" class="s">shortlink, v2.2.0</text>
+  <path d="M85,84 V118" class="l"/>
+  <rect x="170" y="210" width="130" height="64" rx="8" class="box"/>
+  <text x="182" y="232" class="s">loadtester: accept-</text>
+  <text x="182" y="248" class="s">ance + hey load via</text>
+  <text x="182" y="264" class="s">shortlink-canary</text>
+  <path d="M235,208 V176" class="l"/>
+  <text x="20" y="300" class="s">6 x 15 s iterations; error rate &lt; 1%,</text>
+  <text x="20" y="316" class="s">p95 &lt; 250 ms, else rollback (green scaled to 0)</text>
+  <!-- phase 2 -->
+  <text x="340" y="28" class="h">2. Switch: one selector change</text>
+  <rect x="340" y="44" width="280" height="40" rx="8" class="box"/>
+  <text x="354" y="69" class="s">Service shortlink -> app=shortlink</text>
+  <rect x="340" y="120" width="130" height="54" rx="8" class="blue"/>
+  <text x="352" y="142" class="t">blue</text><text x="352" y="160" class="s">rolling to v2.2.0</text>
+  <rect x="490" y="120" width="130" height="54" rx="8" class="green"/>
+  <text x="502" y="142" class="t">green</text><text x="502" y="160" class="s">serves 100%</text>
+  <path d="M555,84 V118" class="l"/>
+  <text x="340" y="210" class="s">Flagger copies the green pod spec</text>
+  <text x="340" y="226" class="s">into the primary Deployment while</text>
+  <text x="340" y="242" class="s">green carries all traffic.</text>
+  <!-- phase 3 -->
+  <text x="660" y="28" class="h">3. Finalise: back to the primary</text>
+  <rect x="660" y="44" width="280" height="40" rx="8" class="box"/>
+  <text x="674" y="69" class="s">Service shortlink -> app=shortlink-primary</text>
+  <rect x="660" y="120" width="130" height="54" rx="8" class="blue"/>
+  <text x="672" y="142" class="t">primary</text><text x="672" y="160" class="s">now v2.2.0</text>
+  <rect x="810" y="120" width="130" height="54" rx="8" class="green" stroke-dasharray="5 4"/>
+  <text x="822" y="142" class="t">green</text><text x="822" y="160" class="s">scaled to 0</text>
+  <path d="M725,84 V118" class="l"/>
+  <text x="660" y="210" class="s">Envoy follows EndpointSlice updates;</text>
+  <text x="660" y="226" class="s">preStop sleep 5 s + readiness gates</text>
+  <text x="660" y="242" class="s">keep in-flight requests safe.</text>
+  <path d="M308,147 H330" class="d"/>
+  <path d="M628,147 H650" class="d"/>
+</svg>

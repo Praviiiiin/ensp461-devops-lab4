@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#374151;stroke-width:1.4}
+      .ns{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.2;stroke-dasharray:5 4}
+      .t{font-weight:bold;font-size:14px;fill:#111827}
+      .t[font-size]{font-size:12.5px}
+      .s{font-size:12px;fill:#4b5563}
+      .l{stroke:#374151;stroke-width:1.4;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="540" fill="#ffffff"/>
+  <!-- GitHub side -->
+  <rect x="20" y="20" width="250" height="235" class="ns" rx="10"/>
+  <text x="34" y="44" class="t">GitHub (public)</text>
+  <rect x="38" y="58" width="214" height="56" class="box" rx="8"/>
+  <text x="50" y="80" class="t" font-size="13">Praviiiiin/ensp461-devops-lab4</text>
+  <text x="50" y="99" class="s">app code + manifests + SOPS secrets</text>
+  <rect x="38" y="128" width="214" height="52" class="box" rx="8"/>
+  <text x="50" y="150" class="t">GitHub Actions</text>
+  <text x="50" y="168" class="s">unit, integration, gitleaks gates</text>
+  <rect x="38" y="194" width="214" height="46" class="box" rx="8"/>
+  <text x="50" y="214" class="t">GHCR image</text>
+  <text x="50" y="231" class="s">shortlink-lab4:&lt;ver&gt;-&lt;sha&gt; (arm64)</text>
+  <path d="M145,114 V126" class="l"/>
+  <path d="M145,180 V192" class="l"/>
+  <!-- cluster -->
+  <rect x="300" y="20" width="640" height="500" class="ns" rx="10"/>
+  <text x="314" y="44" class="t">kind cluster pv-lab4 (Docker network pv-lab4-net, arm64 Mac)</text>
+  <rect x="318" y="58" width="190" height="62" class="box" rx="8"/>
+  <text x="330" y="80" class="t">Flux (flux-system)</text>
+  <text x="330" y="98" class="s">source, kustomize, helm</text>
+  <text x="330" y="113" class="s">SOPS decryption (age key)</text>
+  <rect x="524" y="58" width="190" height="62" class="box" rx="8"/>
+  <text x="536" y="80" class="t">Flagger + loadtester</text>
+  <text x="536" y="98" class="s">canary / blue-green</text>
+  <text x="536" y="113" class="s">metric gates, webhooks</text>
+  <rect x="730" y="58" width="190" height="62" class="box" rx="8"/>
+  <text x="742" y="80" class="t">Prometheus + Grafana</text>
+  <text x="742" y="98" class="s">5 s scrape of app metrics</text>
+  <text x="742" y="113" class="s">NodePorts 8491 / 8490</text>
+  <rect x="318" y="140" width="602" height="52" class="box" rx="8"/>
+  <text x="330" y="162" class="t">Envoy Gateway "public" (Gateway API) - host port 8480</text>
+  <text x="330" y="180" class="s">canary.shortlink.test -> weighted HTTPRoute | bluegreen.shortlink.test -> Service "shortlink"</text>
+  <rect x="318" y="212" width="290" height="132" class="ns" rx="10"/>
+  <text x="330" y="234" class="t">sl-canary</text>
+  <rect x="332" y="246" width="128" height="40" class="box" rx="8"/><text x="342" y="271" class="s">shortlink-primary</text>
+  <rect x="470" y="246" width="126" height="40" class="box" rx="8"/><text x="480" y="271" class="s">shortlink (canary)</text>
+  <text x="332" y="312" class="s">Canary: gatewayapi:v1, 10% steps to 50%</text>
+  <text x="332" y="330" class="s">HPA 2-4, Secret shortlink-secrets</text>
+  <rect x="630" y="212" width="290" height="132" class="ns" rx="10"/>
+  <text x="642" y="234" class="t">sl-bg</text>
+  <rect x="644" y="246" width="128" height="40" class="box" rx="8"/><text x="654" y="271" class="s">shortlink-primary</text>
+  <rect x="782" y="246" width="126" height="40" class="box" rx="8"/><text x="792" y="271" class="s">shortlink (green)</text>
+  <text x="644" y="312" class="s">Canary: kubernetes provider,</text>
+  <text x="644" y="330" class="s">6 isolated iterations, then switch</text>
+  <rect x="318" y="364" width="602" height="70" class="ns" rx="10"/>
+  <text x="330" y="386" class="t">sl-data</text>
+  <rect x="420" y="374" width="170" height="48" class="box" rx="8"/><text x="432" y="395" class="t">pg-a-0</text><text x="432" y="412" class="s">PostgreSQL 17 primary</text>
+  <rect x="720" y="374" width="186" height="48" class="box" rx="8"/><text x="732" y="395" class="t">pg-b-0</text><text x="732" y="412" class="s">hot standby (streaming)</text>
+  <path d="M590,398 H716" class="l"/><text x="608" y="391" class="s">WAL stream</text>
+  <rect x="318" y="452" width="290" height="52" class="box" rx="8"/>
+  <text x="330" y="474" class="t">Velero + node agent (velero)</text>
+  <text x="330" y="492" class="s">pre-backup pg_dump hook, Kopia fs-backup</text>
+  <!-- probes and Garage outside the cluster -->
+  <rect x="20" y="290" width="250" height="74" class="box" rx="8"/>
+  <text x="34" y="312" class="t">Probes on the Mac</text>
+  <text x="34" y="330" class="s">probe.py / write-probe.py</text>
+  <text x="34" y="348" class="s">via localhost:8480 (Host header)</text>
+  <rect x="20" y="400" width="250" height="110" class="ns" rx="10"/>
+  <text x="34" y="424" class="t">Docker on the Mac</text>
+  <rect x="38" y="440" width="214" height="56" class="box" rx="8"/>
+  <text x="50" y="462" class="t">pv-garage (Garage S3)</text>
+  <text x="50" y="480" class="s">bucket "velero", off-cluster</text>
+  <!-- arrows -->
+  <path d="M252,86 H316" class="l"/>
+  <text x="257" y="104" class="s" font-size="11">pull 1m</text>
+  <path d="M252,217 H284 V266 H330" class="l"/>
+  <path d="M413,120 V138" class="l"/>
+  <path d="M619,120 V138" class="l"/>
+  <path d="M463,192 V244" class="l"/>
+  <path d="M775,192 V244" class="l"/>
+  <path d="M316,478 H254" class="l"/>
+  <path d="M270,327 H292 V176 H316" class="l"/>
+  <path d="M463,286 V372" class="l"/>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#374151;stroke-width:1.4}
+      .k{fill:#eff6ff;stroke:#2563eb;stroke-width:1.6}
+      .warn{fill:#fef2f2;stroke:#dc2626;stroke-width:1.6}
+      .t{font-weight:bold;font-size:14px;fill:#111827}
+      .s{font-size:12px;fill:#4b5563}
+      .l{stroke:#374151;stroke-width:1.4;fill:none;marker-end:url(#a)}
+      .r{stroke:#dc2626;stroke-width:1.4;fill:none;stroke-dasharray:5 4;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="320" fill="#ffffff"/>
+  <rect x="20" y="40" width="200" height="90" rx="8" class="box"/>
+  <text x="34" y="64" class="t">Git (main)</text>
+  <text x="34" y="84" class="s">clusters/pv-lab4</text>
+  <text x="34" y="100" class="s">infrastructure/{controllers,configs}</text>
+  <text x="34" y="116" class="s">apps/{data,workloads}</text>
+  <rect x="20" y="170" width="200" height="60" rx="8" class="box"/>
+  <text x="34" y="194" class="t">operator</text>
+  <text x="34" y="212" class="s">commit / revert, never kubectl</text>
+  <path d="M120,168 V132" class="l"/>
+  <rect x="270" y="40" width="190" height="90" rx="8" class="box"/>
+  <text x="284" y="64" class="t">GitRepository</text>
+  <text x="284" y="84" class="s">flux-system, poll 1 m</text>
+  <text x="284" y="100" class="s">ignore: all but clusters/,</text>
+  <text x="284" y="116" class="s">infrastructure/, apps/</text>
+  <path d="M220,85 H268" class="l"/>
+  <text x="510" y="30" class="t">Kustomizations (interval 2 m, prune, dependsOn)</text>
+  <rect x="510" y="44" width="200" height="44" rx="8" class="k"/>
+  <text x="522" y="64" class="t">infra-controllers</text>
+  <text x="522" y="80" class="s">HelmReleases, wait</text>
+  <rect x="740" y="44" width="200" height="44" rx="8" class="k"/>
+  <text x="752" y="64" class="t">infra-configs</text>
+  <text x="752" y="80" class="s">Gateway, MetricTemplates</text>
+  <rect x="510" y="110" width="200" height="44" rx="8" class="k"/>
+  <text x="522" y="130" class="t">data</text>
+  <text x="522" y="146" class="s">Postgres pair, SOPS secret</text>
+  <rect x="740" y="110" width="200" height="44" rx="8" class="k"/>
+  <text x="752" y="130" class="t">apps</text>
+  <text x="752" y="146" class="s">sl-canary, sl-bg, SOPS</text>
+  <path d="M710,66 H738" class="l"/>
+  <path d="M840,88 C840,100 610,96 610,108" class="l"/>
+  <path d="M710,132 H738" class="l"/>
+  <path d="M460,85 C485,85 485,66 508,66" class="l"/>
+  <rect x="510" y="200" width="430" height="100" rx="8" class="box"/>
+  <text x="524" y="224" class="t">cluster state</text>
+  <text x="524" y="244" class="s">each interval: server-side dry-run diff against Git, re-apply</text>
+  <text x="524" y="262" class="s">drifted fields, recreate deleted objects, prune objects</text>
+  <text x="524" y="280" class="s">removed from Git; Flagger owns rollouts of changed Deployments</text>
+  <path d="M840,154 V198" class="l"/>
+  <rect x="270" y="210" width="190" height="80" rx="8" class="warn"/>
+  <text x="284" y="234" class="t">manual drift</text>
+  <text x="284" y="254" class="s">kubectl delete / edit</text>
+  <text x="284" y="270" class="s">reverted within &lt;= 2 m</text>
+  <path d="M462,250 H508" class="r"/>
+</svg>

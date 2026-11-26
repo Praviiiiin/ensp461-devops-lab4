@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#374151;stroke-width:1.4}
+      .ns{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.2;stroke-dasharray:5 4}
+      .k{fill:#eff6ff;stroke:#2563eb;stroke-width:1.6}
+      .g{fill:#f0fdf4;stroke:#16a34a;stroke-width:1.6}
+      .red{fill:#fef2f2;stroke:#dc2626;stroke-width:1.6}
+      .t{font-weight:bold;font-size:14px;fill:#111827}
+      .s{font-size:12px;fill:#4b5563}
+      .h{font-weight:bold;font-size:13px;fill:#374151}
+      .l{stroke:#374151;stroke-width:1.4;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="360" fill="#ffffff"/>
+  <text x="20" y="26" class="h">A. Backup and restore (Velero, off-cluster Garage S3)</text>
+  <rect x="20" y="40" width="210" height="96" rx="10" class="ns"/>
+  <text x="32" y="60" class="t">sl-data</text>
+  <rect x="32" y="70" width="186" height="54" rx="8" class="k"/>
+  <text x="44" y="90" class="s">pre hook: pg_dump -Fc of</text>
+  <text x="44" y="106" class="s">sl_canary, sl_bg -> /dumps</text>
+  <rect x="270" y="40" width="200" height="96" rx="8" class="box"/>
+  <text x="284" y="62" class="t">Velero backup</text>
+  <text x="284" y="82" class="s">manifests (tar.gz) +</text>
+  <text x="284" y="98" class="s">Kopia copy of /dumps</text>
+  <text x="284" y="114" class="s">(PVCs excluded)</text>
+  <rect x="510" y="40" width="190" height="96" rx="8" class="g"/>
+  <text x="524" y="62" class="t">pv-garage</text>
+  <text x="524" y="82" class="s">bucket velero, outside</text>
+  <text x="524" y="98" class="s">the cluster (Docker)</text>
+  <rect x="740" y="40" width="200" height="96" rx="10" class="ns"/>
+  <text x="752" y="60" class="t">sl-data-dr (fresh)</text>
+  <rect x="752" y="70" width="176" height="54" rx="8" class="k"/>
+  <text x="764" y="90" class="s">initdb + post-restore hook:</text>
+  <text x="764" y="106" class="s">pg_restore from /dumps</text>
+  <path d="M230,88 H268" class="l"/><path d="M470,88 H508" class="l"/><path d="M700,88 H738" class="l"/>
+  <text x="20" y="166" class="h">B. Database failover (streaming replica promotion)</text>
+  <rect x="20" y="180" width="180" height="70" rx="8" class="red"/>
+  <text x="34" y="204" class="t">pg-a-0 primary</text>
+  <text x="34" y="222" class="s">lost: statefulset</text>
+  <text x="34" y="238" class="s">scaled to 0</text>
+  <rect x="240" y="180" width="200" height="70" rx="8" class="box"/>
+  <text x="254" y="204" class="t">pg-failover.sh</text>
+  <text x="254" y="222" class="s">pg_isready from pg-b-0,</text>
+  <text x="254" y="238" class="s">3 misses at 1 s -> act</text>
+  <rect x="480" y="180" width="200" height="70" rx="8" class="g"/>
+  <text x="494" y="204" class="t">pg-b-0 promoted</text>
+  <text x="494" y="222" class="s">select pg_promote();</text>
+  <text x="494" y="238" class="s">Service pg -> pg-b-0</text>
+  <rect x="720" y="180" width="220" height="70" rx="8" class="k"/>
+  <text x="734" y="204" class="t">Git catches up</text>
+  <text x="734" y="222" class="s">commit new primary, resume</text>
+  <text x="734" y="238" class="s">Flux; pg-a re-seeds as standby</text>
+  <path d="M200,215 H238" class="l"/><path d="M440,215 H478" class="l"/><path d="M680,215 H718" class="l"/>
+  <rect x="20" y="276" width="920" height="70" rx="8" class="box"/>
+  <text x="34" y="298" class="t">Objectives</text>
+  <text x="34" y="318" class="s">Restore path: RPO = schedule interval (15 min), RTO = measured restore-to-verified-data time.</text>
+  <text x="34" y="334" class="s">Failover path: RPO = unreplicated WAL at failure (async, measured by acknowledged writes), RTO = first successful write after the fault.</text>
+</svg>
