@@ -16,9 +16,12 @@ data:
     echo "host replication replicator all scram-sha-256" >> "$PGDATA/pg_hba.conf"
   seed-replica.sh: |
     #!/bin/sh
-    # Init container of the standby: clone the primary once, then stream from it (-R).
+    # Init container of every member: an empty standby (PRIMARY_HOST set) clones the primary
+    # once and then streams from it (-R); the designated primary (PRIMARY_HOST empty) is left
+    # to initdb. Which member is primary is declared in Git (postgres.yaml).
     set -e
     if [ -s "$PGDATA/PG_VERSION" ]; then echo "data present, skipping base backup"; exit 0; fi
+    if [ -z "$PRIMARY_HOST" ]; then echo "designated primary: initdb will run"; exit 0; fi
     until pg_isready -h "$PRIMARY_HOST" -U replicator; do sleep 2; done
     PGPASSWORD="$REPLICATION_PASSWORD" pg_basebackup -h "$PRIMARY_HOST" -U replicator \
       -D "$PGDATA" -R -X stream -P

@@ -42,9 +42,30 @@ spec:
         pre.hook.backup.velero.io/container: postgres
         pre.hook.backup.velero.io/command: '["/bin/sh", "/scripts/backup-dump.sh"]'
         pre.hook.backup.velero.io/timeout: 2m
+        # Velero restore: once the fresh primary is up, load the dump that came back with /dumps.
+        post.hook.restore.velero.io/container: postgres
+        post.hook.restore.velero.io/command: '["/bin/sh", "/scripts/restore-dump.sh"]'
+        post.hook.restore.velero.io/wait-timeout: 5m
+        post.hook.restore.velero.io/exec-timeout: 5m
     spec:
       securityContext: { runAsUser: 70, runAsGroup: 70, fsGroup: 70 }
       terminationGracePeriodSeconds: 20
+      initContainers:
+        - name: seed-replica
+          image: postgres:17-alpine
+          command: ["/bin/sh", "/scripts/seed-replica.sh"]
+          env:
+          - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          - name: POSTGRES_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: superuser-password } }
+          - name: REPLICATION_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: replication-password } }
+          - name: APP_PASSWORD
+            valueFrom: { secretKeyRef: { name: pg-credentials, key: app-password } }
+          - { name: PRIMARY_HOST, value: "" }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: scripts, mountPath: /scripts }
       containers:
         - name: postgres
           image: postgres:17-alpine
@@ -95,6 +116,11 @@ spec:
         pre.hook.backup.velero.io/container: postgres
         pre.hook.backup.velero.io/command: '["/bin/sh", "/scripts/backup-dump.sh"]'
         pre.hook.backup.velero.io/timeout: 2m
+        # Velero restore: once the fresh primary is up, load the dump that came back with /dumps.
+        post.hook.restore.velero.io/container: postgres
+        post.hook.restore.velero.io/command: '["/bin/sh", "/scripts/restore-dump.sh"]'
+        post.hook.restore.velero.io/wait-timeout: 5m
+        post.hook.restore.velero.io/exec-timeout: 5m
     spec:
       securityContext: { runAsUser: 70, runAsGroup: 70, fsGroup: 70 }
       terminationGracePeriodSeconds: 20
