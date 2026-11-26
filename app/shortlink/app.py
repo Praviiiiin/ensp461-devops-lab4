@@ -51,7 +51,7 @@ def new_code() -> str:
 
 
 def valid_url(url) -> bool:
-    if not isinstance(url, str):
+    if not isinstance(url, str) or len(url) > MAX_URL_LEN:
         return False
     parts = urlparse(url)
     # Reject embedded credentials (https://user:pass@host): they would leak through redirects.
