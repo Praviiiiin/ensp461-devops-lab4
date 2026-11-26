@@ -1,0 +1,27 @@
+# Flagger analysis metrics computed from ShortLink's own Prometheus counters, scoped to
+# the pods of the release under test ({{ target }}-<hash>-<id>, never the -primary pods).
+# Probe endpoints are excluded so only user-facing requests count.
+apiVersion: flagger.app/v1beta1
+kind: MetricTemplate
+metadata: { name: shortlink-error-rate, namespace: flagger-system }
+spec:
+  provider: { type: prometheus, address: http://prometheus-server.monitoring.svc }
+  # Written as 100 - success% so the query still returns 0 (not "no data") when there are no 5xx.
+  query: |
+    100 - 100 * sum(rate(shortlink_http_requests_total{
+        namespace="{{ namespace }}", pod=~"{{ target }}-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)",
+        route!~"/healthz|/readyz|/metrics", status!~"5.."}[{{ interval }}]))
+    /
+    sum(rate(shortlink_http_requests_total{
+        namespace="{{ namespace }}", pod=~"{{ target }}-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)",
+        route!~"/healthz|/readyz|/metrics"}[{{ interval }}]))
+---
+apiVersion: flagger.app/v1beta1
+kind: MetricTemplate
+metadata: { name: shortlink-p95-latency-ms, namespace: flagger-system }
+spec:
+  provider: { type: prometheus, address: http://prometheus-server.monitoring.svc }
+  query: |
+    1000 * histogram_quantile(0.95, sum by (le) (rate(shortlink_http_request_duration_seconds_bucket{
+        namespace="{{ namespace }}", pod=~"{{ target }}-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)",
+        route!~"/healthz|/readyz|/metrics"}[{{ interval }}])))
