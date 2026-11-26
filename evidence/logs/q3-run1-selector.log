@@ -1,0 +1,15 @@
+
+# 2026-11-26 16:37:35 IST
+$ end=$(( $(date +%s) + 520 )); last=""; while [ $(date +%s) -lt $end ]; do s="selector=$(kubectl -n sl-bg get svc shortlink -o jsonpath="{.spec.selector.app}") endpoints=$(kubectl -n sl-bg get endpointslices -l kubernetes.io/service-name=shortlink -o jsonpath="{range .items[*].endpoints[*]}{.targetRef.name} {end}")"; [ "$s" != "$last" ] && echo "$(date -u +%T) $s" && last=$s; sleep 1; done
+11:07:35 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft 
+11:08:09 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml 
+11:09:54 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml shortlink-primary-85494fc99d-sqxs8 
+11:11:34 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml shortlink-primary-85494fc99d-sqxs8 shortlink-primary-6879f9fc74-kcj4w 
+11:11:37 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml shortlink-primary-85494fc99d-sqxs8 shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 
+11:11:38 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml shortlink-primary-85494fc99d-sqxs8 shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 shortlink-primary-6879f9fc74-4xhjx 
+11:11:39 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml shortlink-primary-85494fc99d-sqxs8 shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 shortlink-primary-6879f9fc74-4xhjx shortlink-primary-6879f9fc74-tz8t5 
+11:12:01 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-85494fc99d-lgzml shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 shortlink-primary-6879f9fc74-4xhjx shortlink-primary-6879f9fc74-tz8t5 
+11:12:02 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-85494fc99d-qrrft shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 shortlink-primary-6879f9fc74-4xhjx shortlink-primary-6879f9fc74-tz8t5 
+11:12:04 selector=shortlink-primary endpoints=shortlink-primary-85494fc99d-wc85d shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 shortlink-primary-6879f9fc74-4xhjx shortlink-primary-6879f9fc74-tz8t5 
+11:12:05 selector=shortlink-primary endpoints=shortlink-primary-6879f9fc74-kcj4w shortlink-primary-6879f9fc74-kdd89 shortlink-primary-6879f9fc74-4xhjx shortlink-primary-6879f9fc74-tz8t5 
+[exit 0]

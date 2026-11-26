@@ -1,0 +1,1 @@
+probe bluegreen.shortlink.test 360s: requests=23884 ok=23883 5xx=1 conn_errors=0 other=0 slow(>0.5s)=0 availability=99.996% seconds_with_errors=1 v2.3.0=23883

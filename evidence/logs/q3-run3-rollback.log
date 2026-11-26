@@ -1,0 +1,44 @@
+
+# 2026-11-26 16:58:42 IST
+$ echo "pushed at $(cat evidence/data/q3-run3-rollback.pushed-at) UTC"; ./scripts/watch-canary.sh sl-bg 600
+pushed at 11:28:32 UTC
+11:28:42 +0s Succeeded weight=0 failedChecks=1 iterations=0
+11:30:35 +113s Progressing weight=0 failedChecks=0 iterations=0
+11:30:49 +127s Progressing weight=0 failedChecks=1 iterations=0
+11:31:04 +142s Progressing weight=0 failedChecks=1 iterations=1
+11:31:18 +156s Progressing weight=0 failedChecks=2 iterations=1
+11:31:35 +173s Failed weight=0 failedChecks=0 iterations=0
+[exit 0]
+
+# 2026-11-26 17:01:38 IST
+$ kubectl -n flagger-system logs deploy/flagger --since=6m | python3 -c 'import sys,json
+for l in sys.stdin:
+    try: d=json.loads(l)
+    except ValueError: continue
+    if d.get("canary")=="shortlink.sl-bg": print(d["ts"][11:19], d["msg"])'; kubectl -n sl-bg get deploy -o custom-columns=NAME:.metadata.name,REPLICAS:.spec.replicas,IMAGE:.spec.template.spec.containers[0].image
+11:30:33 New revision detected! Scaling up shortlink.sl-bg
+11:30:48 Starting canary analysis for shortlink.sl-bg
+11:30:48 Halt shortlink.sl-bg advancement pre-rollout check acceptance-test failed POST http://loadtester.flagger-system/ giving up after 1 attempt(s)
+11:31:03 Starting canary analysis for shortlink.sl-bg
+11:31:03 Pre-rollout check acceptance-test passed
+11:31:03 Advance shortlink.sl-bg canary iteration 1/6
+11:31:18 Halt advancement no values found for custom metric: error-rate-percent: no values found
+11:31:33 Rolling back shortlink.sl-bg failed checks threshold reached 2
+11:31:33 Canary failed! Scaling down shortlink.sl-bg
+NAME                REPLICAS   IMAGE
+shortlink           0          ghcr.io/praviiiiin/shortlink-lab4:2.3.0-a4ce538
+shortlink-primary   2          ghcr.io/praviiiiin/shortlink-lab4:2.3.0-a4ce538
+[exit 0]
+
+# 2026-11-26 17:04:34 IST
+$ cat evidence/data/q3-run3-rollback.summary
+probe bluegreen.shortlink.test 360s: requests=23884 ok=23883 5xx=1 conn_errors=0 other=0 slow(>0.5s)=0 availability=99.996% seconds_with_errors=1 v2.3.0=23883
+[exit 0]
+
+# 2026-11-26 17:04:44 IST
+$ python3 -c "
+import csv,time
+for x in csv.DictReader(open('evidence/data/q3-run3-rollback.csv')):
+    if int(x['err5xx']): print('5xx at', time.strftime('%H:%M:%S',time.gmtime(int(x['epoch']))), 'served_by_app_pods=', int(x['primary'])+int(x['canary']), 'ok=', x['ok'], '(the failed response carried no X-ShortLink-Version header, so it came from the gateway, not from a ShortLink pod)')"
+5xx at 11:30:32 served_by_app_pods= 63 ok= 63 (the failed response carried no X-ShortLink-Version header, so it came from the gateway, not from a ShortLink pod)
+[exit 0]
