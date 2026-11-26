@@ -1,0 +1,121 @@
+
+# 2026-11-26 16:46:47 IST
+$ ./scripts/dr-backup-restore.sh dr-drill-1
+== 11:16:47 primary is pg-a-0; seeding 5000 links into sl_canary
+INSERT 0 5000
+fingerprint before backup: sl_canary 5008 rows, md5 c9ce46db7b4e15984d6986fe395305c9 | sl_bg 3 rows, md5 b7a1946b28cff1d8cc3ffe23fb3eee43
+== 11:16:48 backup dr-drill-1 (sl-data, PVCs excluded: the logical dump carries the data)
+Backup request "dr-drill-1" submitted successfully.
+Waiting for backup to complete. You may safely press ctrl-c to stop waiting - your backup will continue in the background.
+...........
+Backup completed with status: Completed. You may check for more information using the commands `velero backup describe dr-drill-1` and `velero backup logs dr-drill-1`.
+Phase:  Completed
+Completed:  2026-11-26 16:47:00 +0530 IST
+Total items to be backed up:  69
+Items backed up:              69
+velero: Get "http://pv-garage:3900/velero/backups/dr-drill-1/dr-drill-1-logs.gz?<presigned query removed>": dial tcp: lookup pv-garage: no such host
+[exit 1]
+# note: the velero CLI runs on the Mac, where the in-cluster name pv-garage does not resolve; BSL publicUrl set to http://127.0.0.1:3900 and the drill repeated as dr-drill-2
+
+# 2026-11-26 16:47:19 IST
+$ ./scripts/dr-backup-restore.sh dr-drill-2
+== 11:17:20 primary is pg-a-0; seeding 5000 links into sl_canary
+INSERT 0 0
+fingerprint before backup: sl_canary 5008 rows, md5 c9ce46db7b4e15984d6986fe395305c9 | sl_bg 3 rows, md5 b7a1946b28cff1d8cc3ffe23fb3eee43
+== 11:17:20 backup dr-drill-2 (sl-data, PVCs excluded: the logical dump carries the data)
+Backup request "dr-drill-2" submitted successfully.
+Waiting for backup to complete. You may safely press ctrl-c to stop waiting - your backup will continue in the background.
+
+Backup completed with status: PartiallyFailed. You may check for more information using the commands `velero backup describe dr-drill-2` and `velero backup logs dr-drill-2`.
+Phase:  PartiallyFailed (run `velero backup logs dr-drill-2` for more information)
+Completed:  2026-11-26 16:47:20 +0530 IST
+Total items to be backed up:  69
+Items backed up:              69
+msg="running exec hook" container=postgres phase=pre
+msg="stdout: total 40\n-rw-r--r--    1 postgres postgres      1837 Nov 26 11:17 sl_bg.dump\n-rw-r--r--    1 postgres postgres     28746 Nov 26 11:17 sl_canary.dump\n-rw-r--r--    1 postgres postgres        21 Nov 26 11:17 taken-at\n" container=postgres phase=pre
+msg="running exec hook" container=postgres phase=pre
+msg="stdout: standby: no dump\n" container=postgres phase=pre
+== 11:17:21 250 writes after the backup (they are outside its recovery point)
+INSERT 0 250
+== 11:17:21 restore into fresh namespace sl-data-dr
+Restore request "dr-drill-2-to-dr" submitted successfully.
+Waiting for restore to complete. You may safely press ctrl-c to stop waiting - your restore will continue in the background.
+
+Restore completed with status: Completed. You may check for more information using the commands `velero restore describe dr-drill-2-to-dr` and `velero restore logs dr-drill-2-to-dr`.
+Phase:                       Completed
+Total items to be restored:  20
+Items restored:              20
+HooksAttempted:   0
+HooksFailed:      0
+# note: dr-drill-2 PartiallyFailed - the Kopia repository was being re-established after the BSL publicUrl change, so the dumps volume was skipped; the restore had no data and the fingerprint check never matched. Drill stopped, sl-data-dr deleted, repeated as dr-drill-3.
+
+# 2026-11-26 16:51:47 IST
+$ ./scripts/dr-backup-restore.sh dr-drill-3
+== 11:21:47 primary is pg-a-0; seeding 5000 links into sl_canary
+INSERT 0 0
+fingerprint before backup: sl_canary 5258 rows, md5 f92533ff21a5053e222f13cbce80aa01 | sl_bg 4 rows, md5 1718079526ec9e23cde4b1616e3182eb
+== 11:21:47 backup dr-drill-3 (sl-data, PVCs excluded: the logical dump carries the data)
+Backup request "dr-drill-3" submitted successfully.
+Waiting for backup to complete. You may safely press ctrl-c to stop waiting - your backup will continue in the background.
+..........
+Backup completed with status: Completed. You may check for more information using the commands `velero backup describe dr-drill-3` and `velero backup logs dr-drill-3`.
+velero: invalid output format "jsonpath={.status.phase}" - valid values are 'table', 'json', and 'yaml'
+[exit 1]
+# note: dr-drill-3 completed but the script's phase check used an unsupported velero -o jsonpath flag and aborted before the restore; check switched to kubectl, drill repeated as dr-drill-4.
+
+# 2026-11-26 16:52:30 IST
+$ ./scripts/dr-backup-restore.sh dr-drill-4
+== 11:22:30 primary is pg-a-0; seeding 5000 links into sl_canary
+INSERT 0 0
+fingerprint before backup: sl_canary 5258 rows, md5 f92533ff21a5053e222f13cbce80aa01 | sl_bg 4 rows, md5 1718079526ec9e23cde4b1616e3182eb
+== 11:22:30 backup dr-drill-4 (sl-data, PVCs excluded: the logical dump carries the data)
+Backup request "dr-drill-4" submitted successfully.
+Waiting for backup to complete. You may safely press ctrl-c to stop waiting - your backup will continue in the background.
+..........
+Backup completed with status: Completed. You may check for more information using the commands `velero backup describe dr-drill-4` and `velero backup logs dr-drill-4`.
+Phase:  Completed
+Completed:  2026-11-26 16:52:41 +0530 IST
+Total items to be backed up:  55
+Items backed up:              55
+  Pod Volume Backups - kopia:
+    Completed:
+      sl-data/pg-a-0: dumps (size: 32133, incremental size: 32133)
+      sl-data/pg-b-0: dumps (size: 0, incremental size: 0)
+msg="running exec hook" container=postgres phase=pre
+msg="stdout: total 40\n-rw-r--r--    1 postgres postgres      1862 Nov 26 11:22 sl_bg.dump\n-rw-r--r--    1 postgres postgres     30250 Nov 26 11:22 sl_canary.dump\n-rw-r--r--    1 postgres postgres        21 Nov 26 11:22 taken-at\n" container=postgres phase=pre
+msg="running exec hook" container=postgres phase=pre
+msg="stdout: standby: no dump\n" container=postgres phase=pre
+== 11:22:42 250 writes after the backup (they are outside its recovery point)
+INSERT 0 250
+== 11:22:42 restore into fresh namespace sl-data-dr
+Restore request "dr-drill-4-to-dr" submitted successfully.
+Waiting for restore to complete. You may safely press ctrl-c to stop waiting - your restore will continue in the background.
+...............................
+Restore completed with status: Completed. You may check for more information using the commands `velero restore describe dr-drill-4-to-dr` and `velero restore logs dr-drill-4-to-dr`.
+Phase:                       Completed
+Total items to be restored:  22
+Items restored:              22
+HooksAttempted:   2
+HooksFailed:      0
+fingerprint restored:      sl_canary 5258 rows, md5 f92533ff21a5053e222f13cbce80aa01 | sl_bg 4 rows, md5 1718079526ec9e23cde4b1616e3182eb
+sl_bg matches
+source now has 5508 rows; restored copy lacks the 250 post-backup rows (RPO = time since backup)
+NAME         READY   STATUS    RESTARTS   AGE
+pod/pg-a-0   1/1     Running   0          32s
+pod/pg-b-0   0/1     Running   0          32s
+
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/pg           ClusterIP   10.96.176.248   <none>        5432/TCP   32s
+service/pg-hl        ClusterIP   None            <none>        5432/TCP   32s
+service/pg-standby   ClusterIP   10.96.23.108    <none>        5432/TCP   32s
+backup took 10.9s; restore API call 31.4s; restore-to-verified-data (RTO) 31.7s
+[exit 0]
+
+# 2026-11-26 16:53:19 IST
+$ velero restore logs dr-drill-4-to-dr | grep -E "msg=\"(running exec hook|stdout: restored)" | sed -E "s/time=\"[^\"]*\" level=info //; s/ restore=.*hookPhase=([a-z]+).*/ phase=\1/; s/ restore=.*//" | head -4; ./scripts/pgq.sh sl-data-dr pg-a-0 postgres "select application_name, state from pg_stat_replication"; ./scripts/pgq.sh sl-data-dr pg-a-0 sl_canary "select code, url from links where code in ($(printf "%s" "'dr00042','late-4-0001'"))"; velero schedule create sl-data-15m --schedule "*/15 * * * *" --include-namespaces sl-data --exclude-resources persistentvolumeclaims,persistentvolumes --ttl 72h0m0s; velero schedule get
+walreceiver|streaming
+dr00042|https://krmu.edu.in/dr/42
+Schedule "sl-data-15m" created successfully.
+NAME          STATUS    CREATED                         SCHEDULE       BACKUP TTL   LAST BACKUP   SELECTOR   PAUSED
+sl-data-15m   Enabled   2026-11-26 16:53:20 +0530 IST   */15 * * * *   72h0m0s      n/a           <none>     false
+[exit 0]

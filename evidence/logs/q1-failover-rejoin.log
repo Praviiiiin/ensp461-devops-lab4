@@ -1,0 +1,55 @@
+
+# 2026-11-26 17:07:55 IST
+$ git log -1 --format="%h %s"; kubectl -n sl-data delete pvc data-pg-a-0 --wait=false; flux resume kustomization data; flux reconcile source git flux-system >/dev/null; flux reconcile kustomization data 2>&1 | tail -1; kubectl -n sl-data wait --for=condition=ready pod/pg-a-0 --timeout=180s; kubectl -n sl-data logs pg-a-0 -c seed-replica | tail -2; ./scripts/pgq.sh sl-data pg-b-0 postgres "select application_name, client_addr, state, sync_state from pg_stat_replication"; ./scripts/pgq.sh sl-data pg-a-0 postgres "select pg_is_in_recovery()"; ./scripts/pgq.sh sl-data pg-a-0 sl_canary "select count(*) from links"; kubectl -n sl-data get pods,svc
+4f1c451 Record the failover in Git: pg-b is primary, pg-a rejoins as standby
+persistentvolumeclaim "data-pg-a-0" deleted from sl-data namespace
+► resuming kustomization data in flux-system namespace
+✔ kustomization resumed
+◎ waiting for Kustomization reconciliation
+✔ Kustomization data reconciliation completed
+✔ applied revision main@sha1:4f1c4514a979dbcc1f92da1975880ae05c747d16
+► annotating GitRepository flux-system in flux-system namespace
+✔ GitRepository annotated
+◎ waiting for GitRepository reconciliation
+✔ fetched revision main@sha1:4f1c4514a979dbcc1f92da1975880ae05c747d16
+✔ applied revision main@sha1:4f1c4514a979dbcc1f92da1975880ae05c747d16
+pod/pg-a-0 condition met
+data present, skipping base backup
+f
+ERROR:  relation "links" does not exist
+LINE 1: select count(*) from links
+                             ^
+command terminated with exit code 1
+NAME         READY   STATUS    RESTARTS   AGE
+pod/pg-a-0   1/1     Running   0          9s
+pod/pg-b-0   1/1     Running   0          8s
+
+NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+service/pg           ClusterIP   10.96.62.69    <none>        5432/TCP   94m
+service/pg-hl        ClusterIP   None           <none>        5432/TCP   94m
+service/pg-standby   ClusterIP   10.96.103.49   <none>        5432/TCP   94m
+[exit 0]
+
+# 2026-11-26 17:09:36 IST
+$ echo "finding: flux resume reconciled the cached pre-commit revision first, so pg-a came back with an empty volume as a standalone primary (fenced: Service pg already pointed at pg-b-0). Redoing the rejoin in the safe order: freeze, scale to 0, drop the volume, then resume on the current revision."; flux suspend kustomization data; kubectl -n sl-data scale statefulset pg-a --replicas=0; kubectl -n sl-data wait --for=delete pod/pg-a-0 --timeout=60s; kubectl -n sl-data delete pvc data-pg-a-0; flux get sources git flux-system | tail -1; flux resume kustomization data 2>&1 | tail -1; until kubectl -n sl-data get pod pg-a-0 >/dev/null 2>&1; do sleep 1; done; kubectl -n sl-data wait --for=condition=ready pod/pg-a-0 --timeout=180s; kubectl -n sl-data logs pg-a-0 -c seed-replica | tail -2; ./scripts/pgq.sh sl-data pg-b-0 postgres "select application_name, state, sync_state from pg_stat_replication"; ./scripts/pgq.sh sl-data pg-a-0 postgres "select pg_is_in_recovery()"; ./scripts/pgq.sh sl-data pg-a-0 sl_canary "select count(*) from links"; ./scripts/pgq.sh sl-data pg-b-0 sl_canary "select count(*) from links"; kubectl -n sl-data get pods,svc pg pg-standby -o wide
+finding: flux resume reconciled the cached pre-commit revision first, so pg-a came back with an empty volume as a standalone primary (fenced: Service pg already pointed at pg-b-0). Redoing the rejoin in the safe order: freeze, scale to 0, drop the volume, then resume on the current revision.
+► suspending kustomization data in flux-system namespace
+✔ kustomization suspended
+statefulset.apps/pg-a scaled
+pod/pg-a-0 condition met
+persistentvolumeclaim "data-pg-a-0" deleted from sl-data namespace
+flux-system	main@sha1:4f1c4514	False    	True 	stored artifact for revision 'main@sha1:4f1c4514'	
+✔ applied revision main@sha1:4f1c4514a979dbcc1f92da1975880ae05c747d16
+pod/pg-a-0 condition met
+40557/40557 kB (100%), 0/1 tablespace
+40557/40557 kB (100%), 1/1 tablespace
+walreceiver|streaming|async
+t
+12506
+12506
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+pg           ClusterIP   10.96.62.69    <none>        5432/TCP   94m   app=pg,statefulset.kubernetes.io/pod-name=pg-b-0
+pg-standby   ClusterIP   10.96.103.49   <none>        5432/TCP   94m   app=pg,statefulset.kubernetes.io/pod-name=pg-a-0
+Error from server (NotFound): pods "pg" not found
+Error from server (NotFound): pods "pg-standby" not found
+[exit 1]

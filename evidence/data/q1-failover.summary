@@ -1,0 +1,1 @@
+write-probe canary.shortlink.test: acked=6995 failed=10 failure_window=40..57s start_epoch=1795692885

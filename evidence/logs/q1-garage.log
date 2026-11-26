@@ -1,0 +1,77 @@
+
+# 2026-11-26 16:24:30 IST
+$ ./platform/garage.sh
+e75b50bf3663d18fa3c240e984474e59e7375f41328d3650c071414cfddcb38a
+2026-11-26T10:54:33.462949Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:33.503627Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+2026-11-26T10:54:33.541703Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:33.582647Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+Role changes are staged but not yet committed.
+Use `garage layout show` to view staged role changes,
+and `garage layout apply` to enact staged changes.
+2026-11-26T10:54:33.621723Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:33.662650Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+==== COMPUTATION OF A NEW PARTITION ASSIGNATION ====
+
+Partitions are replicated 1 times on at least 1 distinct zones.
+
+Optimal partition size:                     39.1 MB
+Usable capacity / total cluster capacity:   10.0 GB / 10.0 GB (100.0 %)
+Effective capacity (replication factor 1):  10.0 GB
+
+lab                 Tags  Partitions        Capacity  Usable capacity
+  a5492e6054c033cc  []    256 (256 new)     10.0 GB   10.0 GB (100.0%)
+  TOTAL                   256 (256 unique)  10.0 GB   10.0 GB (100.0%)
+
+
+New cluster layout with updated role assignment has been applied in cluster.
+Data will now be moved around between nodes accordingly.
+2026-11-26T10:54:33.823587Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:33.867821Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+==== BUCKET INFORMATION ====
+Bucket:          e3df0c8c5663e93d38a1b2d6848724ccca3f3a11f9279fbed12686342ea5cd22
+Created:         2026-11-26 10:54:33.868 +00:00
+
+Size:            0 B (0 B)
+Objects:         0
+
+Website access:  false
+
+Global alias:    velero
+
+==== KEYS FOR THIS BUCKET ====
+Permissions  Access key    Local aliases
+2026-11-26T10:54:33.904631Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:33.944287Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+2026-11-26T10:54:33.992011Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:34.032866Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+==== BUCKET INFORMATION ====
+Bucket:          e3df0c8c5663e93d38a1b2d6848724ccca3f3a11f9279fbed12686342ea5cd22
+Created:         2026-11-26 10:54:33.868 +00:00
+
+Size:            0 B (0 B)
+Objects:         0
+
+Website access:  false
+
+Global alias:    velero
+
+==== KEYS FOR THIS BUCKET ====
+Permissions  Access key                              Local aliases
+RWO          GKd0706d033741c475e3062ca6  velero-key  
+2026-11-26T10:54:34.067620Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:34.110401Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+==== HEALTHY NODES ====
+ID                Hostname      Address         Tags  Zone  Capacity  DataAvail         Version
+a5492e6054c033cc  e75b50bf3663  127.0.0.1:3901  []    lab   10.0 GB   144.0 GB (73.5%)  v2.1.0
+2026-11-26T10:54:34.143227Z  INFO garage_net::netapp: Connected to 127.0.0.1:3901, negotiating handshake...    
+2026-11-26T10:54:34.187036Z  INFO garage_net::netapp: Connection established to a5492e6054c033cc    
+==== BUCKET INFORMATION ====
+Bucket:          e3df0c8c5663e93d38a1b2d6848724ccca3f3a11f9279fbed12686342ea5cd22
+Created:         2026-11-26 10:54:33.868 +00:00
+
+Size:            0 B (0 B)
+Objects:         0
+
+Website access:  false
+[exit 0]

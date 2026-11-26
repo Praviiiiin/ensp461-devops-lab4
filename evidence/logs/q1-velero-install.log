@@ -1,0 +1,139 @@
+
+# 2026-11-26 16:25:01 IST
+$ ./platform/velero.sh
+CustomResourceDefinition/backuprepositories.velero.io: attempting to create resource client
+CustomResourceDefinition/backuprepositories.velero.io: attempting to create resource
+CustomResourceDefinition/backuprepositories.velero.io: created
+CustomResourceDefinition/backups.velero.io: attempting to create resource client
+CustomResourceDefinition/backups.velero.io: attempting to create resource
+CustomResourceDefinition/backups.velero.io: created
+CustomResourceDefinition/backupstoragelocations.velero.io: attempting to create resource client
+CustomResourceDefinition/backupstoragelocations.velero.io: attempting to create resource
+CustomResourceDefinition/backupstoragelocations.velero.io: created
+CustomResourceDefinition/deletebackuprequests.velero.io: attempting to create resource client
+CustomResourceDefinition/deletebackuprequests.velero.io: attempting to create resource
+CustomResourceDefinition/deletebackuprequests.velero.io: created
+CustomResourceDefinition/downloadrequests.velero.io: attempting to create resource client
+CustomResourceDefinition/downloadrequests.velero.io: attempting to create resource
+CustomResourceDefinition/downloadrequests.velero.io: created
+CustomResourceDefinition/podvolumebackups.velero.io: attempting to create resource client
+CustomResourceDefinition/podvolumebackups.velero.io: attempting to create resource
+CustomResourceDefinition/podvolumebackups.velero.io: created
+CustomResourceDefinition/podvolumerestores.velero.io: attempting to create resource client
+CustomResourceDefinition/podvolumerestores.velero.io: attempting to create resource
+CustomResourceDefinition/podvolumerestores.velero.io: created
+CustomResourceDefinition/restores.velero.io: attempting to create resource client
+CustomResourceDefinition/restores.velero.io: attempting to create resource
+CustomResourceDefinition/restores.velero.io: created
+CustomResourceDefinition/schedules.velero.io: attempting to create resource client
+CustomResourceDefinition/schedules.velero.io: attempting to create resource
+CustomResourceDefinition/schedules.velero.io: created
+CustomResourceDefinition/serverstatusrequests.velero.io: attempting to create resource client
+CustomResourceDefinition/serverstatusrequests.velero.io: attempting to create resource
+CustomResourceDefinition/serverstatusrequests.velero.io: created
+CustomResourceDefinition/volumesnapshotlocations.velero.io: attempting to create resource client
+CustomResourceDefinition/volumesnapshotlocations.velero.io: attempting to create resource
+CustomResourceDefinition/volumesnapshotlocations.velero.io: created
+CustomResourceDefinition/datadownloads.velero.io: attempting to create resource client
+CustomResourceDefinition/datadownloads.velero.io: attempting to create resource
+CustomResourceDefinition/datadownloads.velero.io: created
+CustomResourceDefinition/datauploads.velero.io: attempting to create resource client
+CustomResourceDefinition/datauploads.velero.io: attempting to create resource
+CustomResourceDefinition/datauploads.velero.io: created
+Waiting for resources to be ready in cluster...
+Namespace/velero: attempting to create resource client
+Namespace/velero: attempting to create resource
+Namespace/velero: created
+ClusterRoleBinding/velero: attempting to create resource client
+ClusterRoleBinding/velero: attempting to create resource
+ClusterRoleBinding/velero: created
+ServiceAccount/velero: attempting to create resource client
+ServiceAccount/velero: attempting to create resource
+ServiceAccount/velero: created
+Secret/cloud-credentials: attempting to create resource client
+Secret/cloud-credentials: attempting to create resource
+Secret/cloud-credentials: created
+BackupStorageLocation/default: attempting to create resource client
+BackupStorageLocation/default: attempting to create resource
+BackupStorageLocation/default: created
+Deployment/velero: attempting to create resource client
+Deployment/velero: attempting to create resource
+Deployment/velero: created
+DaemonSet/node-agent: attempting to create resource client
+DaemonSet/node-agent: attempting to create resource
+DaemonSet/node-agent: created
+Waiting for Velero deployment to be ready.
+velero: 
+Error installing Velero. Use `kubectl logs deploy/velero -n velero` to check the deploy logs: context deadline exceeded
+[exit 1]
+--- first attempt failed: velero install defaulted to image velero/velero:1.19.0 (no such tag); uninstalling and pinning v1.19.0
+
+# 2026-11-26 16:28:50 IST
+$ ./platform/velero.sh
+CustomResourceDefinition/backuprepositories.velero.io: attempting to create resource client
+CustomResourceDefinition/backuprepositories.velero.io: attempting to create resource
+CustomResourceDefinition/backuprepositories.velero.io: created
+CustomResourceDefinition/backups.velero.io: attempting to create resource client
+CustomResourceDefinition/backups.velero.io: attempting to create resource
+CustomResourceDefinition/backups.velero.io: created
+CustomResourceDefinition/backupstoragelocations.velero.io: attempting to create resource client
+CustomResourceDefinition/backupstoragelocations.velero.io: attempting to create resource
+CustomResourceDefinition/backupstoragelocations.velero.io: created
+CustomResourceDefinition/deletebackuprequests.velero.io: attempting to create resource client
+CustomResourceDefinition/deletebackuprequests.velero.io: attempting to create resource
+CustomResourceDefinition/deletebackuprequests.velero.io: created
+CustomResourceDefinition/downloadrequests.velero.io: attempting to create resource client
+CustomResourceDefinition/downloadrequests.velero.io: attempting to create resource
+CustomResourceDefinition/downloadrequests.velero.io: created
+CustomResourceDefinition/podvolumebackups.velero.io: attempting to create resource client
+CustomResourceDefinition/podvolumebackups.velero.io: attempting to create resource
+CustomResourceDefinition/podvolumebackups.velero.io: created
+CustomResourceDefinition/podvolumerestores.velero.io: attempting to create resource client
+CustomResourceDefinition/podvolumerestores.velero.io: attempting to create resource
+CustomResourceDefinition/podvolumerestores.velero.io: created
+CustomResourceDefinition/restores.velero.io: attempting to create resource client
+CustomResourceDefinition/restores.velero.io: attempting to create resource
+CustomResourceDefinition/restores.velero.io: created
+CustomResourceDefinition/schedules.velero.io: attempting to create resource client
+CustomResourceDefinition/schedules.velero.io: attempting to create resource
+CustomResourceDefinition/schedules.velero.io: created
+CustomResourceDefinition/serverstatusrequests.velero.io: attempting to create resource client
+CustomResourceDefinition/serverstatusrequests.velero.io: attempting to create resource
+CustomResourceDefinition/serverstatusrequests.velero.io: created
+CustomResourceDefinition/volumesnapshotlocations.velero.io: attempting to create resource client
+CustomResourceDefinition/volumesnapshotlocations.velero.io: attempting to create resource
+CustomResourceDefinition/volumesnapshotlocations.velero.io: created
+CustomResourceDefinition/datadownloads.velero.io: attempting to create resource client
+CustomResourceDefinition/datadownloads.velero.io: attempting to create resource
+CustomResourceDefinition/datadownloads.velero.io: created
+CustomResourceDefinition/datauploads.velero.io: attempting to create resource client
+CustomResourceDefinition/datauploads.velero.io: attempting to create resource
+CustomResourceDefinition/datauploads.velero.io: created
+Waiting for resources to be ready in cluster...
+Namespace/velero: attempting to create resource client
+Namespace/velero: attempting to create resource
+Namespace/velero: created
+ClusterRoleBinding/velero: attempting to create resource client
+ClusterRoleBinding/velero: attempting to create resource
+ClusterRoleBinding/velero: created
+ServiceAccount/velero: attempting to create resource client
+ServiceAccount/velero: attempting to create resource
+ServiceAccount/velero: created
+Secret/cloud-credentials: attempting to create resource client
+Secret/cloud-credentials: attempting to create resource
+Secret/cloud-credentials: created
+BackupStorageLocation/default: attempting to create resource client
+BackupStorageLocation/default: attempting to create resource
+BackupStorageLocation/default: created
+Deployment/velero: attempting to create resource client
+Deployment/velero: attempting to create resource
+Deployment/velero: created
+DaemonSet/node-agent: attempting to create resource client
+DaemonSet/node-agent: attempting to create resource
+DaemonSet/node-agent: created
+Waiting for Velero deployment to be ready.
+Waiting for node-agent daemonset to be ready.
+Velero is installed! ⛵ Use 'kubectl logs deployment/velero -n velero' to view the status.
+NAME      PROVIDER   BUCKET/PREFIX   PHASE       LAST VALIDATED                  ACCESS MODE   DEFAULT
+default   aws        velero          Available   2026-11-26 16:29:14 +0530 IST   ReadWrite     true
+[exit 0]

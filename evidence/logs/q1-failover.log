@@ -1,0 +1,47 @@
+
+# 2026-11-26 17:04:44 IST
+$ ./scripts/pg-failover-drill.sh
+11:34:44.519 freeze GitOps for the data tier during the incident (else Flux would undo the failover)
+► suspending kustomization data in flux-system namespace
+✔ kustomization suspended
+11:35:24.823 replication before the crash:
+walreceiver|streaming|async|0
+11:35:25.400 CRASH: SIGKILL to the pg-a-0 postmaster (host pid 88893), node treated as lost (statefulset scaled to 0)
+statefulset.apps/pg-a scaled
+--- failover controller log
+11:34:45.149 watching pg-a-0 from pg-b-0
+11:35:26.159 primary check failed (1/3)
+11:35:27.275 primary check failed (2/3)
+11:35:28.378 primary check failed (3/3)
+11:35:28.395 fencing: scale statefulset/pg-a to 0
+statefulset.apps/pg-a scaled
+11:35:28.451 promoting pg-b-0: t
+service/pg patched
+11:35:28.792 service pg now selects pg-b-0; in recovery: f
+write-probe canary.shortlink.test: acked=6995 failed=10 failure_window=40..57s start_epoch=1795692885
+crash at epoch 1795692925.4; first failed write second 1795692924; first clean second after outage 1795692927
+RTO (crash -> writes acknowledged again) ~ 1.6s; seconds with failed writes: 2
+11:37:14.951 acknowledged writes missing on the promoted primary (RPO):
+ acked | present | lost 
+-------+---------+------
+  6995 |    6995 |    0
+(1 row)
+
+f|2026-11-26 11:37:15.222756+00
+NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+pg     ClusterIP   10.96.62.69   <none>        5432/TCP   92m   app=pg,statefulset.kubernetes.io/pod-name=pg-b-0
+Error from server (NotFound): pods "pg" not found
+[exit 1]
+
+# 2026-11-26 17:07:34 IST
+$ echo "re-analysis of the run above with the corrected RTO definition (scripts/failover-analysis.py)"; python3 scripts/failover-analysis.py evidence/data/q1-failover.csv 1795692925.4; kubectl -n sl-data get pods -o wide; kubectl -n sl-data get svc pg -o wide
+re-analysis of the run above with the corrected RTO definition (scripts/failover-analysis.py)
+median acknowledged writes/s before crash: 48
+failed writes by start second: [(40, 9), (57, 1)]
+crash at probe second 41.4; full write rate again in second 47
+RTO (crash -> normal write rate) ~ 5.6s
+NAME     READY   STATUS    RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
+pg-b-0   1/1     Running   0          30m   10.244.0.49   pv-lab4-control-plane   <none>           <none>
+NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+pg     ClusterIP   10.96.62.69   <none>        5432/TCP   92m   app=pg,statefulset.kubernetes.io/pod-name=pg-b-0
+[exit 0]
