@@ -10,5 +10,8 @@ kubectl config use-context kind-pv-lab4
 kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f -
 kubectl -n flux-system create secret generic sops-age --from-file=age.agekey=.secrets/age.agekey \
   --dry-run=client -o yaml | kubectl apply -f -
+# First pass installs the CRDs (the sync objects are rejected), second pass after they are established.
+kubectl apply --server-side -k clusters/pv-lab4/flux-system || true
+kubectl wait --for condition=established --timeout=60s crd/gitrepositories.source.toolkit.fluxcd.io crd/kustomizations.kustomize.toolkit.fluxcd.io
 kubectl apply --server-side -k clusters/pv-lab4/flux-system
 flux check
