@@ -33,7 +33,7 @@ spec:
     prometheus-node-exporter: { enabled: false }
     kube-state-metrics: { enabled: false }
     server:
-      global: { scrape_interval: 5s, evaluation_interval: 5s }
+      global: { scrape_interval: 5s, scrape_timeout: 4s, evaluation_interval: 5s }
       retention: 7d
       persistentVolume: { size: 4Gi }
       service: { type: NodePort, nodePort: 30091 }
