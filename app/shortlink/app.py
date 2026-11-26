@@ -168,6 +168,7 @@ def create_app(store=None, fault_error_rate=None, fault_latency_ms=None, fault_a
             return jsonify(error="not found"), 404
         resp = redirect(url, code=302)
         resp.headers["X-Robots-Tag"] = "noindex"  # short links should not be indexed as pages
+        resp.headers["Referrer-Policy"] = "no-referrer"  # do not leak the short code to the target site
         return resp
 
     @app.get("/api/links/<code>")
