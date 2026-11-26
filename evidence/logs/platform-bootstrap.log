@@ -1,0 +1,32 @@
+
+# 2026-11-26 15:20:36 IST
+$ kind create cluster --config platform/kind.yaml --wait 120s && kubectl get nodes -o wide && docker network ls --filter name=pv-
+Creating cluster "pv-lab4" ...
+ • Ensuring node image (kindest/node:v1.37.0) 🖼️  ...
+WARNING: Overriding docker network due to KIND_EXPERIMENTAL_DOCKER_NETWORK
+WARNING: Here be dragons! This is not supported currently.
+ ✓ Ensuring node image (kindest/node:v1.37.0) 🖼️
+ • Preparing nodes 📦   ...
+ ✓ Preparing nodes 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Waiting ≤ 2m0s for control-plane = Ready ⏳  ...
+ ✓ Waiting ≤ 2m0s for control-plane = Ready ⏳
+ • Ready after 18s 💚
+Set kubectl context to "kind-pv-lab4"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-pv-lab4
+
+Thanks for using kind! 😊
+NAME                    STATUS   ROLES           AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                                CONTAINER-RUNTIME
+pv-lab4-control-plane   Ready    control-plane   23s   v1.37.0   192.168.147.2   <none>        Debian GNU/Linux 13 (trixie)   7.2.12-orbstack-00394-gbecdd6130068 (arm64)   containerd://2.3.4
+NETWORK ID     NAME          DRIVER    SCOPE
+f474bd55f4f8   pv-lab4-net   bridge    local
+[exit 0]
