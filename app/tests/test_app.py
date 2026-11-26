@@ -119,7 +119,8 @@ def test_bad_alias_rejected(client, alias):
 
 
 def test_version_header(client):
-    assert client.get("/healthz").headers["X-ShortLink-Version"] == "dev"
+    r = client.get("/healthz")
+    assert r.headers["X-ShortLink-Version"] == "dev" and r.headers["X-Served-By"]
 
 
 def test_delete_needs_admin_token(client, tmp_path, monkeypatch):

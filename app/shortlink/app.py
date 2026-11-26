@@ -18,6 +18,7 @@ from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_
 from .store import CodeTaken
 
 VERSION = os.getenv("APP_VERSION", "dev")
+POD = os.getenv("HOSTNAME", "local")
 COLOUR = os.getenv("APP_COLOUR", "none")
 ALPHABET = string.ascii_letters + string.digits
 CODE_LEN = 7
@@ -110,6 +111,7 @@ def create_app(store=None, fault_error_rate=None, fault_latency_ms=None, fault_a
                 )
             )
         resp.headers["X-ShortLink-Version"] = VERSION
+        resp.headers["X-Served-By"] = POD  # lets the blue-green probe see which pod set answered
         return resp
 
     def admin_ok() -> bool:
